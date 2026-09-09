@@ -3,281 +3,212 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Washer Log & Chemical Dashboard</title>
+<title>Washer Log & Chemical Dashboard - Fixed</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
-<script>
-tailwind.config = {
-  theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'], display: ['Plus Jakarta Sans','sans-serif'] } } }
-}
-</script>
 <style>
-body{background:#f6f7fb}
-.glass{backdrop-filter:blur(12px); background:rgba(255,255,255,0.85)}
+body{background:#f6f7fb; font-family:Inter,sans-serif}
 .card{border-radius:20px; background:white; box-shadow:0 10px 30px rgba(15,23,42,0.04); border:1px solid #eef2f7}
 .kpi-gradient{background: radial-gradient(120% 120% at 0% 0%, #4f46e5 0%, #2563eb 50%, #0ea5e9 100%)}
 </style>
 </head>
-<body class="font-sans text-slate-800">
+<body>
 
-<!-- LINK GOOGLESHEET -->
 <script>
+// ================== GANTI INI DENGAN URL DEPLOYMENT BARU KAMU ==================
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEi6WAP3wPP-_8H4vXBMOwamcDrBNgqYSdbkUA8MQyXTCJn6Gpo_CRAElIKadxGQwf/exec";
-// GANTI dengan URL Web App kamu yang terbaru
+// Contoh: https://script.google.com/macros/s/AKfycb.../exec
 </script>
 
 <div class="max-w-[1440px] mx-auto px-6 py-8">
-  <!-- Header -->
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
     <div>
-      <h1 class="font-display text-[28px] font-bold text-slate-900 tracking-tight">Washer Log & Chemical Tracking</h1>
-      <p class="text-slate-500 mt-1 text-sm"><i class="fa-solid fa-leaf mr-2 text-emerald-500"></i>Monitoring volume cucian, performa staff, mesin, program & biaya chemical real-time</p>
+      <h1 class="font-['Plus_Jakarta_Sans'] text-[28px] font-bold">Washer Log & Chemical Tracking</h1>
+      <p class="text-slate-500 mt-1 text-sm">Monitoring volume cucian, performa staff, mesin, program & biaya chemical real-time</p>
+      <div id="errorBox" class="hidden mt-3 bg-red-50 border border-red-200 text-red-700 text-xs p-3 rounded-xl"></div>
     </div>
     <div class="flex items-center gap-2">
-      <span id="statusDot" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-      <span id="statusText" class="text-xs text-slate-500">Live connected to Sheet</span>
+      <span id="statusDot" class="w-2 h-2 rounded-full bg-amber-500"></span>
+      <span id="statusText" class="text-xs text-slate-500">Belum terhubung</span>
     </div>
   </div>
 
-  <!-- Filter -->
   <div class="card p-5 mb-6">
     <div class="flex flex-wrap gap-4 items-end">
-      <div class="flex-1 min-w-[180px]">
-        <label class="text-[11px] font-semibold tracking-widest text-slate-500 uppercase">Tanggal Mulai</label>
-        <input type="date" id="startDate" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-      </div>
-      <div class="flex-1 min-w-[180px]">
-        <label class="text-[11px] font-semibold tracking-widest text-slate-500 uppercase">Tanggal Selesai</label>
-        <input type="date" id="endDate" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-      </div>
-      <button onclick="loadDashboard()" class="bg-slate-900 hover:bg-black text-white rounded-xl px-6 py-2.5 text-sm font-semibold transition"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Tampilkan Data</button>
-      <button onclick="resetFilter()" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl px-6 py-2.5 text-sm font-semibold transition"><i class="fa-solid fa-rotate mr-2"></i>Reset</button>
-      <div class="ml-auto flex items-center gap-2 text-xs text-slate-400"><i class="fa-solid fa-database"></i><span id="rangeInfo">01-Aug-2026 — 31-Aug-2026</span></div>
+      <div class="flex-1 min-w-[180px]"><label class="text-[11px] font-semibold tracking-widest text-slate-500 uppercase">Tanggal Mulai</label><input type="date" id="startDate" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none"></div>
+      <div class="flex-1 min-w-[180px]"><label class="text-[11px] font-semibold tracking-widest text-slate-500 uppercase">Tanggal Selesai</label><input type="date" id="endDate" class="mt-2 w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none"></div>
+      <button onclick="loadDashboard()" class="bg-slate-900 hover:bg-black text-white rounded-xl px-6 py-2.5 text-sm font-semibold"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Tampilkan Data</button>
+      <button onclick="resetFilter()" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl px-6 py-2.5 text-sm font-semibold"><i class="fa-solid fa-rotate mr-2"></i>Reset</button>
+      <div class="ml-auto text-xs text-slate-400"><span id="rangeInfo">-</span></div>
     </div>
   </div>
 
-  <!-- KPI Row -->
   <div class="grid grid-cols-12 gap-5 mb-6">
     <div class="col-span-12 lg:col-span-5">
       <div class="kpi-gradient rounded-[24px] p-7 text-white relative overflow-hidden h-full">
-        <div class="absolute -right-10 -top-10 w-56 h-56 bg-white/10 rounded-full blur-2xl"></div>
-        <div class="relative z-10">
-          <div class="flex items-center justify-between">
-            <p class="text-white/70 text-[11px] tracking-[0.2em] uppercase font-semibold">Total Volume Pencucian</p>
-            <span class="bg-white/20 rounded-full px-3 py-1 text-[10px]">KG</span>
-          </div>
-          <h2 id="totalKg" class="font-display text-[48px] font-bold leading-none mt-4">47.474</h2>
-          <p class="text-white/80 text-sm mt-1">Kilogram linen tercuci</p>
-          <div class="mt-6 grid grid-cols-3 gap-3">
-            <div class="bg-white/10 rounded-xl p-3"><p class="text-[10px] text-white/60 uppercase">Avg / Hari</p><p id="avgKg" class="font-semibold mt-1">1.532 Kg</p></div>
-            <div class="bg-white/10 rounded-xl p-3"><p class="text-[10px] text-white/60 uppercase">Total Chemical</p><p id="totalChemMl" class="font-semibold mt-1">-</p></div>
-            <div class="bg-white/10 rounded-xl p-3"><p class="text-[10px] text-white/60 uppercase">Total Biaya</p><p id="totalCost" class="font-semibold mt-1">-</p></div>
-          </div>
+        <p class="text-white/70 text-[11px] tracking-[0.2em] uppercase font-semibold">Total Volume Pencucian</p>
+        <h2 id="totalKg" class="font-['Plus_Jakarta_Sans'] text-[48px] font-bold leading-none mt-4">-</h2>
+        <p class="text-white/80 text-sm mt-1">Kilogram linen tercuci</p>
+        <div class="mt-6 grid grid-cols-3 gap-3">
+          <div class="bg-white/10 rounded-xl p-3"><p class="text-[10px] text-white/60 uppercase">Avg / Hari</p><p id="avgKg" class="font-semibold mt-1">-</p></div>
+          <div class="bg-white/10 rounded-xl p-3"><p class="text-[10px] text-white/60 uppercase">Total Chemical</p><p id="totalChemMl" class="font-semibold mt-1">-</p></div>
+          <div class="bg-white/10 rounded-xl p-3"><p class="text-[10px] text-white/60 uppercase">Total Biaya</p><p id="totalCost" class="font-semibold mt-1">-</p></div>
         </div>
       </div>
     </div>
-    <div class="col-span-12 lg:col-span-7 grid grid-cols-12 gap-5">
-      <div class="col-span-12 md:col-span-7 card p-5">
-        <div class="flex items-center justify-between mb-3"><h3 class="font-semibold text-sm">Pencucian Per Mesin</h3><span class="text-[11px] text-slate-400">by Kg</span></div>
-        <canvas id="machineChart" height="160"></canvas>
-      </div>
-      <div class="col-span-12 md:col-span-5 card p-5">
-        <div class="flex items-center justify-between mb-3"><h3 class="font-semibold text-sm">Mix Program</h3><span class="text-[11px] text-slate-400">Top 5</span></div>
-        <canvas id="programChart" height="160"></canvas>
+    <div class="col-span-12 lg:col-span-7">
+      <div class="card p-5 h-full">
+        <div class="flex items-center justify-between mb-4"><h3 class="font-semibold text-sm"><i class="fa-solid fa-chart-line mr-2 text-blue-600"></i>Trend Harian Pencucian (Kg / Hari)</h3><span class="text-[11px] bg-blue-50 text-blue-600 px-2 py-1 rounded-full">NEW</span></div>
+        <canvas id="dailyChart" height="180"></canvas>
       </div>
     </div>
   </div>
 
-  <!-- Main Tables + Charts -->
   <div class="grid grid-cols-12 gap-5">
-    <!-- Staff -->
     <div class="col-span-12 lg:col-span-6 card p-5">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="font-display font-semibold">Top 10 Staff Paling Produktif</h3>
-        <div class="w-32"><canvas id="staffChart" height="100"></canvas></div>
-      </div>
-      <div class="overflow-hidden rounded-xl border border-slate-100">
-        <table class="w-full text-sm">
-          <thead class="bg-slate-50 text-[11px] tracking-widest uppercase text-slate-500"><tr><th class="text-left px-4 py-2.5">#</th><th class="text-left px-4 py-2.5">Nama Staff</th><th class="text-right px-4 py-2.5">Total</th><th class="text-right px-4 py-2.5 w-24">%</th></tr></thead>
-          <tbody id="topStaffTable" class="divide-y divide-slate-50"></tbody>
-        </table>
-      </div>
+      <div class="flex items-center justify-between mb-4"><h3 class="font-['Plus_Jakarta_Sans'] font-semibold">Top 10 Staff Paling Produktif</h3><div class="w-28"><canvas id="staffChart" height="80"></canvas></div></div>
+      <div class="overflow-hidden rounded-xl border border-slate-100"><table class="w-full text-sm"><thead class="bg-slate-50 text-[11px] tracking-widest uppercase text-slate-500"><tr><th class="text-left px-4 py-2.5">#</th><th class="text-left px-4 py-2.5">Nama Staff</th><th class="text-right px-4 py-2.5">Total</th><th class="text-right px-4 py-2.5">%</th></tr></thead><tbody id="topStaffTable"></tbody></table></div>
     </div>
-
-    <!-- Machine + Chemical -->
     <div class="col-span-12 lg:col-span-6 space-y-5">
-      <div class="card p-5">
-        <h3 class="font-display font-semibold mb-4">Total Pencucian Per Mesin</h3>
-        <div id="machineList" class="space-y-3"></div>
-      </div>
-
-      <div class="card p-5">
-        <div class="flex items-center justify-between mb-4"><h3 class="font-display font-semibold">Ranking Program Pencucian</h3><i class="fa-solid fa-fire text-orange-400"></i></div>
-        <div class="overflow-hidden rounded-xl border border-slate-100">
-          <table class="w-full text-sm">
-            <thead class="bg-slate-50 text-[11px] tracking-widest uppercase text-slate-500"><tr><th class="text-left px-4 py-2.5">Program</th><th class="text-center px-4 py-2.5">Freq</th><th class="text-right px-4 py-2.5">Kg</th></tr></thead>
-            <tbody id="programTable"></tbody>
-          </table>
-        </div>
-      </div>
+      <div class="card p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-semibold text-sm">Pencucian Per Mesin</h3><span class="text-[11px] text-slate-400">by Kg</span></div><canvas id="machineChart" height="130"></canvas><div id="machineList" class="mt-4 space-y-3"></div></div>
+      <div class="card p-5"><h3 class="font-semibold text-sm mb-3">Ranking Program Pencucian</h3><canvas id="programChart" height="140"></canvas><div class="mt-4 overflow-hidden rounded-xl border border-slate-100"><table class="w-full text-sm"><thead class="bg-slate-50 text-[11px] uppercase text-slate-500"><tr><th class="text-left px-4 py-2.5">Program</th><th class="text-center px-4 py-2.5">Freq</th><th class="text-right px-4 py-2.5">Kg</th></tr></thead><tbody id="programTable"></tbody></table></div></div>
     </div>
 
-    <!-- Chemical Full Width -->
     <div class="col-span-12 card p-6">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div><h3 class="font-display font-semibold text-[18px]">Ranking Penggunaan Chemical (Volume & Biaya)</h3><p class="text-xs text-slate-500 mt-1">Diurutkan berdasarkan biaya tertinggi — sumber: MASTER_CHEMICAL x kapasitas mesin</p></div>
-        <div class="flex gap-2"><canvas id="chemCostChart" width="240" height="80"></canvas></div>
-      </div>
-      <div class="grid grid-cols-12 gap-5">
-        <div class="col-span-12 lg:col-span-7">
-          <div class="overflow-hidden rounded-xl border border-slate-100">
-            <table class="w-full text-sm">
-              <thead class="bg-slate-900 text-white text-[11px] tracking-widest uppercase"><tr><th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Nama Chemical</th><th class="text-right px-4 py-3">Total ml</th><th class="text-right px-4 py-3">Total Rupiah</th></tr></thead>
-              <tbody id="chemTable" class="divide-y divide-slate-50"></tbody>
-            </table>
-          </div>
-        </div>
-        <div class="col-span-12 lg:col-span-5">
-          <div class="rounded-2xl bg-slate-50 p-5 border border-dashed border-slate-200">
-            <h4 class="text-sm font-semibold mb-3">Biaya Chemical Breakdown</h4>
-            <canvas id="chemPieChart" height="240"></canvas>
-            <div id="chemInsight" class="mt-4 text-xs text-slate-600 leading-relaxed bg-white rounded-xl p-3 border"></div>
-          </div>
-        </div>
+      <h3 class="font-['Plus_Jakarta_Sans'] font-semibold text-[18px]">Ranking Penggunaan Chemical (Volume & Biaya)</h3>
+      <div class="grid grid-cols-12 gap-5 mt-5">
+        <div class="col-span-12 lg:col-span-7"><div class="overflow-hidden rounded-xl border border-slate-100"><table class="w-full text-sm"><thead class="bg-slate-900 text-white text-[11px] uppercase"><tr><th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Nama Chemical</th><th class="text-right px-4 py-3">Total ml</th><th class="text-right px-4 py-3">Total Rupiah</th></tr></thead><tbody id="chemTable"></tbody></table></div></div>
+        <div class="col-span-12 lg:col-span-5"><div class="rounded-2xl bg-slate-50 p-5 border border-dashed"><h4 class="text-sm font-semibold mb-3">Biaya Chemical Breakdown</h4><canvas id="chemPieChart" height="220"></canvas><div id="chemInsight" class="mt-4 text-xs text-slate-600 bg-white rounded-xl p-3 border"></div></div></div>
       </div>
     </div>
   </div>
-
-  <p class="text-center text-[11px] text-slate-400 mt-10">Made Suastra • Washer Dashboard v2 • Data live from Google Sheet WASHER_LOG & MASTER_CHEMICAL</p>
 </div>
 
 <script>
-let machineChartObj, programChartObj, staffChartObj, chemCostChartObj, chemPieChartObj;
+let charts = {};
 const fmtKg = v => v.toLocaleString('id-ID') + ' Kg';
-const fmtRupiah = v => 'Rp ' + Math.round(v).toLocaleString('id-ID');
+const fmtRp = v => 'Rp ' + Math.round(v).toLocaleString('id-ID');
 const fmtMl = v => Math.round(v).toLocaleString('id-ID') + ' ml';
 
-function setDefaultDates(){
-  const now = new Date();
-  const first = new Date(now.getFullYear(), now.getMonth(), 1);
-  document.getElementById('startDate').valueAsDate = new Date(2026,7,1);
-  document.getElementById('endDate').valueAsDate = new Date(2026,7,31);
-}
-setDefaultDates();
+(function setDates(){
+  document.getElementById('startDate').value='2026-07-31';
+  document.getElementById('endDate').value='2026-08-30';
+})();
 
 async function loadDashboard(){
-  const start = document.getElementById('startDate').value;
-  const end = document.getElementById('endDate').value;
-  document.getElementById('statusText').innerText = 'Loading...';
-  document.getElementById('rangeInfo').innerText = `${start || '-'} → ${end || '-'}`;
+  const s = document.getElementById('startDate').value;
+  const e = document.getElementById('endDate').value;
+  const statusDot = document.getElementById('statusDot');
+  const statusText = document.getElementById('statusText');
+  const errorBox = document.getElementById('errorBox');
+  
+  statusDot.className='w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+  statusText.innerText='Loading...';
+  errorBox.classList.add('hidden');
+  document.getElementById('rangeInfo').innerText = `${s} → ${e}`;
+
+  if(!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('AKfycbxFeDsa')) {
+    if(GOOGLE_SCRIPT_URL.includes('AKfycbxFeDsa')) {
+      // still example, allow but warn
+    } else {
+      showError('GOOGLE_SCRIPT_URL belum diisi! Paste URL Web App kamu di baris atas index.html');
+      return;
+    }
+  }
 
   try{
-    // cara 1: fetch via Apps Script Web App (CORS enabled)
-    const url = `${GOOGLE_SCRIPT_URL}?action=getDashboardData&startDate=${encodeURIComponent(start)}&endDate=${encodeURIComponent(end)}`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const url = `${GOOGLE_SCRIPT_URL}?action=getDashboardData&startDate=${encodeURIComponent(s)}&endDate=${encodeURIComponent(e)}&t=${Date.now()}`;
+    console.log('Fetching', url);
+    const res = await fetch(url, { method:'GET', redirect:'follow' });
+    if(!res.ok) throw new Error('HTTP '+res.status+' - Pastikan deployment Anyone bisa diakses');
+    const text = await res.text();
+    let data;
+    try{ data = JSON.parse(text); }catch{ throw new Error('Response bukan JSON. Dapat HTML login? Pastikan Deploy > Anyone. Response: '+text.substring(0,200)); }
     if(data.error) throw new Error(data.error);
+    if(!data.topStaff) throw new Error('Data kosong. Cek nama sheet WASHER_LOG & MASTER_CHEMICAL');
     renderDashboard(data);
-    document.getElementById('statusText').innerText = 'Live connected';
-  }catch(e){
-    console.error(e);
-    document.getElementById('statusText').innerText = 'Error: ' + e.message;
-    // fallback demo data if belum connect
-    // renderDashboard(window.demoData || {totalWashKg:47474, topStaff:[], programRank:[], machineRank:[], chemRank:[]});
+    statusDot.className='w-2 h-2 rounded-full bg-emerald-500';
+    statusText.innerText='Live connected';
+  }catch(err){
+    console.error(err);
+    statusDot.className='w-2 h-2 rounded-full bg-red-500';
+    statusText.innerText='Error: Failed to fetch';
+    showError(err.message + '<br><br><b>Solusi Cepat:</b><br>1. Di Apps Script > Deploy > Manage Deployments > Edit > Who has access: <b>Anyone</b><br>2. Deploy ulang dan copy URL baru<br>3. Pastikan spreadsheet yang aktif adalah file yang ada WASHER_LOG<br>4. Jika buka HTML dari file://, coba hosting di Google Drive atau jalankan via VS Code Live Server');
   }
 }
 
-function resetFilter(){
-  setDefaultDates();
-  loadDashboard();
+function showError(msg){
+  const box = document.getElementById('errorBox');
+  box.innerHTML = msg;
+  box.classList.remove('hidden');
 }
 
 function renderDashboard(data){
-  // KPI
   document.getElementById('totalKg').innerText = data.totalWashKg.toLocaleString('id-ID');
-  const days = 31; // approximate, bisa hitung selisih
-  document.getElementById('avgKg').innerText = (data.totalWashKg/days).toFixed(0) + ' Kg';
-  const totalMl = data.chemRank.reduce((s,x)=>s+x.ml,0);
-  const totalCost = data.chemRank.reduce((s,x)=>s+x.cost,0);
-  document.getElementById('totalChemMl').innerText = fmtMl(totalMl);
-  document.getElementById('totalCost').innerText = fmtRupiah(totalCost);
+  const days = data.dailyTrend?.length || 31;
+  document.getElementById('avgKg').innerText = days ? (data.totalWashKg/days).toFixed(0)+' Kg' : '-';
+  const totalMl = data.chemRank.reduce((a,b)=>a+b.ml,0);
+  const totalCost = data.chemRank.reduce((a,b)=>a+b.cost,0);
+  document.getElementById('totalChemMl').innerText = totalMl ? fmtMl(totalMl) : '-';
+  document.getElementById('totalCost').innerText = totalCost ? fmtRp(totalCost) : '-';
 
-  // Staff Table + mini bar
-  const maxStaffKg = Math.max(...data.topStaff.map(s=>s.kg),1);
-  document.getElementById('topStaffTable').innerHTML = data.topStaff.map((item,i)=>{
-    const pct = (item.kg / data.totalWashKg *100).toFixed(1);
-    const bar = (item.kg/maxStaffKg*100).toFixed(0);
-    return `<tr class="hover:bg-slate-50"><td class="px-4 py-2.5 text-slate-400">${i+1}</td>
-      <td class="px-4 py-2.5"><div class="font-medium">${item.name}</div><div class="h-1.5 bg-slate-100 rounded-full mt-1.5 w-full"><div class="h-1.5 bg-slate-900 rounded-full" style="width:${bar}%"></div></div></td>
-      <td class="px-4 py-2.5 text-right font-semibold">${fmtKg(item.kg)}</td>
-      <td class="px-4 py-2.5 text-right text-slate-500">${pct}%</td></tr>`
-  }).join('');
+  // Staff
+  const maxKg = Math.max(...data.topStaff.map(x=>x.kg),1);
+  document.getElementById('topStaffTable').innerHTML = data.topStaff.map((it,i)=>{
+    const pct = (it.kg / data.totalWashKg *100).toFixed(1);
+    return `<tr class="hover:bg-slate-50"><td class="px-4 py-2.5 text-slate-400">${i+1}</td><td class="px-4 py-2.5 font-medium">${it.name}<div class="h-1.5 bg-slate-100 rounded-full mt-1"><div class="h-1.5 bg-slate-900 rounded-full" style="width:${(it.kg/maxKg*100).toFixed(0)}%"></div></div></td><td class="px-4 py-2.5 text-right font-semibold">${fmtKg(it.kg)}</td><td class="px-4 py-2.5 text-right text-slate-500">${pct}%</td></tr>`;
+  }).join('') || '<tr><td colspan=4 class="text-center py-4 text-slate-400">Tidak ada data</td></tr>';
 
-  // Machine List
-  const maxMachine = Math.max(...data.machineRank.map(m=>m.kg),1);
+  // Machines
   document.getElementById('machineList').innerHTML = data.machineRank.map(m=>{
-    const pct = m.kg/maxMachine*100;
-    return `<div><div class="flex justify-between text-sm"><span class="font-medium">${m.machine}</span><span class="font-semibold">${fmtKg(m.kg)}</span></div><div class="h-2 bg-slate-100 rounded-full mt-2"><div class="h-2 rounded-full bg-gradient-to-r from-blue-600 to-cyan-400" style="width:${pct}%"></div></div></div>`
+    const pct = m.kg / Math.max(...data.machineRank.map(x=>x.kg),1) *100;
+    return `<div class="flex justify-between text-sm"><span>${m.machine}</span><span class="font-semibold">${fmtKg(m.kg)}</span></div>`;
   }).join('');
 
-  // Program
-  document.getElementById('programTable').innerHTML = data.programRank.slice(0,10).map(p=>{
-    return `<tr class="hover:bg-slate-50"><td class="px-4 py-2.5"><span class="inline-flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span>${p.program}</span></td><td class="px-4 py-2.5 text-center"><span class="bg-slate-100 px-2.5 py-1 rounded-full text-xs font-semibold">${p.count}x</span></td><td class="px-4 py-2.5 text-right font-medium">${fmtKg(p.totalKg)}</td></tr>`
-  }).join('');
+  document.getElementById('programTable').innerHTML = data.programRank.slice(0,8).map(p=>`<tr class="hover:bg-slate-50"><td class="px-4 py-2.5">${p.program}</td><td class="px-4 py-2.5 text-center"><span class="bg-slate-100 px-2 py-1 rounded-full text-xs">${p.count}x</span></td><td class="px-4 py-2.5 text-right">${fmtKg(p.totalKg)}</td></tr>`).join('');
+  document.getElementById('chemTable').innerHTML = data.chemRank.map((c,i)=>`<tr class="hover:bg-slate-50 ${i==0?'bg-amber-50/60':''}"><td class="px-4 py-2.5 text-slate-400">${i+1}</td><td class="px-4 py-2.5 font-medium">${c.name}</td><td class="px-4 py-2.5 text-right">${fmtMl(c.ml)}</td><td class="px-4 py-2.5 text-right font-semibold">${fmtRp(c.cost)}</td></tr>`).join('');
 
-  // Chemical table
-  document.getElementById('chemTable').innerHTML = data.chemRank.map((c,i)=>{
-    return `<tr class="hover:bg-slate-50 ${i===0?'bg-amber-50/50':''}"><td class="px-4 py-2.5 text-slate-400">${i+1}</td><td class="px-4 py-2.5 font-medium">${c.name}</td><td class="px-4 py-2.5 text-right">${fmtMl(c.ml)}</td><td class="px-4 py-2.5 text-right font-semibold">${fmtRupiah(c.cost)}</td></tr>`
-  }).join('');
+  if(data.chemRank[0]) document.getElementById('chemInsight').innerHTML = `Paling boros <b>${data.chemRank[0].name}</b> ${fmtRp(data.chemRank[0].cost)} (${(data.chemRank[0].cost/totalCost*100).toFixed(1)}% total).`;
 
-  // Insight
-  if(data.chemRank[0]){
-    document.getElementById('chemInsight').innerHTML = `Chemical paling boros biaya adalah <b>${data.chemRank[0].name}</b> sebesar <b>${fmtRupiah(data.chemRank[0].cost)}</b> (${((data.chemRank[0].cost/totalCost)*100).toFixed(1)}% dari total biaya). Perlu cek dosage di MASTER_CHEMICAL untuk program dengan frekuensi tinggi.`;
-  }
-
-  // Charts
   drawCharts(data);
 }
 
 function drawCharts(data){
-  // destroy old
-  [machineChartObj, programChartObj, staffChartObj, chemCostChartObj, chemPieChartObj].forEach(c=>{ if(c) c.destroy(); });
+  Object.values(charts).forEach(c=>c?.destroy());
 
-  // Machine bar
-  machineChartObj = new Chart(document.getElementById('machineChart'), {
-    type:'bar',
-    data:{ labels: data.machineRank.map(m=>m.machine), datasets:[{ data: data.machineRank.map(m=>m.kg), backgroundColor:'#2563eb', borderRadius:8, barThickness:18 }] },
-    options:{ indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}, border:{display:false}}, y:{grid:{display:false}, border:{display:false}, ticks:{font:{size:11}}}} }
+  // Daily trend - NEW
+  charts.daily = new Chart(document.getElementById('dailyChart'), {
+    type:'line',
+    data:{
+      labels: (data.dailyTrend||[]).map(d=>d.date.slice(5)),
+      datasets:[{ label:'Kg', data:(data.dailyTrend||[]).map(d=>d.kg), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.15)', fill:true, tension:0.4, borderWidth:2.5, pointRadius:0 }]
+    },
+    options:{ plugins:{legend:{display:false}}, scales:{ x:{ grid:{display:false} }, y:{ grid:{color:'#f1f5f9'} } } }
   });
 
-  // Program doughnut
-  const top5Prog = data.programRank.slice(0,5);
-  programChartObj = new Chart(document.getElementById('programChart'), {
+  charts.machine = new Chart(document.getElementById('machineChart'), {
+    type:'bar',
+    data:{ labels:data.machineRank.map(m=>m.machine), datasets:[{ data:data.machineRank.map(m=>m.kg), backgroundColor:'#2563eb', borderRadius:8, barThickness:18 }] },
+    options:{ indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{grid:{display:false}}} }
+  });
+
+  charts.program = new Chart(document.getElementById('programChart'), {
     type:'doughnut',
-    data:{ labels: top5Prog.map(p=>p.program), datasets:[{ data: top5Prog.map(p=>p.count), backgroundColor:['#0ea5e9','#6366f1','#10b981','#f59e0b','#ef4444'], borderWidth:0 }] },
-    options:{ cutout:'68%', plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{size:10}}}} }
+    data:{ labels:data.programRank.slice(0,5).map(p=>p.program), datasets:[{ data:data.programRank.slice(0,5).map(p=>p.count), backgroundColor:['#0ea5e9','#6366f1','#10b981','#f59e0b','#ef4444'], borderWidth:0 }] },
+    options:{ cutout:'65%', plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{size:10}}}} }
   });
 
-  // Staff horizontal mini sparkline
-  staffChartObj = new Chart(document.getElementById('staffChart'), {
+  charts.staff = new Chart(document.getElementById('staffChart'), {
     type:'bar',
-    data:{ labels: data.topStaff.slice(0,5).map(s=>s.name.split(' ')[0]), datasets:[{ data: data.topStaff.slice(0,5).map(s=>s.kg), backgroundColor:'#0f172a', borderRadius:6 }] },
+    data:{ labels:data.topStaff.slice(0,5).map(s=>s.name.split(' ')[0]), datasets:[{ data:data.topStaff.slice(0,5).map(s=>s.kg), backgroundColor:'#0f172a', borderRadius:6 }] },
     options:{ plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}} }
   });
 
-  // Chemical cost bar
-  chemCostChartObj = new Chart(document.getElementById('chemCostChart'), {
-    type:'bar',
-    data:{ labels: data.chemRank.slice(0,5).map(c=>c.name.replace('ES ','')), datasets:[{ data: data.chemRank.slice(0,5).map(c=>c.cost), backgroundColor:'#10b981', borderRadius:6 }] },
-    options:{ plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}} }
-  });
-
-  // Chemical pie
-  chemPieChartObj = new Chart(document.getElementById('chemPieChart'), {
+  charts.chem = new Chart(document.getElementById('chemPieChart'), {
     type:'pie',
-    data:{ labels: data.chemRank.map(c=>c.name), datasets:[{ data: data.chemRank.map(c=>c.cost), backgroundColor:['#2563eb','#0ea5e9','#6366f1','#10b981','#f59e0b','#ef4444','#a855f7'], borderWidth:2, borderColor:'#f8fafc' }] },
+    data:{ labels:data.chemRank.map(c=>c.name), datasets:[{ data:data.chemRank.map(c=>c.cost), backgroundColor:['#2563eb','#0ea5e9','#6366f1','#10b981','#f59e0b','#ef4444'], borderWidth:2 }] },
     options:{ plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{size:11}}}} }
   });
 }
