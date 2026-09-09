@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Operational Laundry</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- PapaParse untuk Parsing CSV -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+  <div class="max-w-7xl mx-auto p-6 space-y-6">
+    
+    <!-- Header & Filter -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Dashboard Washer Log</h1>
+        <p class="text-sm text-gray-500">Monitoring operasional, konsumsi kimia, dan utilitas mesin pencuci.</p>
+      </div>
+      
+      <!-- Filter Tanggal -->
+      <div class="flex items-center gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 mb-1">TANGGAL MULAI</label>
+          <input type="date" id="startDate" class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 mb-1">TANGGAL SELESAI</label>
+          <input type="date" id="endDate" class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <button id="btnFilter" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-1.5 rounded-lg text-sm transition">
+          Filter
+        </button>
+      </div>
+    </div>
+
+    <!-- Top KPI Card -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <p class="text-sm font-medium text-gray-500">Total Pencucian (Kg)</p>
+        <h2 id="totalWeight" class="text-3xl font-extrabold text-blue-600 mt-2">0 Kg</h2>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <p class="text-sm font-medium text-gray-500">Total Transaksi / Process</p>
+        <h2 id="totalLogs" class="text-3xl font-extrabold text-gray-800 mt-2">0</h2>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <p class="text-sm font-medium text-gray-500">Estimasi Total Biaya Chemical</p>
+        <h2 id="totalChemicalCost" class="text-3xl font-extrabold text-emerald-600 mt-2">Rp 0</h2>
+      </div>
+    </div>
+
+    <!-- Charts Section 1 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Top 10 Operator -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">Top 10 Operator (Total Load Kg)</h3>
+        <div class="relative h-72">
+          <canvas id="chartTopUsers"></canvas>
+        </div>
+      </div>
+
+      <!-- Beban Kerja Per Mesin -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">Total pencucian per Mesin (Kg)</h3>
+        <div class="relative h-72">
+          <canvas id="chartMachines"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts & Tables Section 2 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- Ranking Wash Program -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">Ranking Program Pencucian</h3>
+        <div class="overflow-y-auto max-h-80">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b text-xs text-gray-400">
+                <th class="py-2">RANK</th>
+                <th class="py-2">NAMA PROGRAM</th>
+                <th class="py-2 text-right">FREKUENSI PENGGUNAAN</th>
+              </tr>
+            </thead>
+            <tbody id="tablePrograms" class="text-sm divide-y"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Ranking Chemical Usage & Cost -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">Penggunaan Chemical & Biaya</h3>
+        <div class="overflow-y-auto max-h-80">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b text-xs text-gray-400">
+                <th class="py-2">RANK</th>
+                <th class="py-2">CHEMICAL</th>
+                <th class="py-2 text-right">VOLUME (ml)</th>
+                <th class="py-2 text-right">ESTIMASI BIAYA (Rp)</th>
+              </tr>
+            </thead>
+            <tbody id="tableChemicals" class="text-sm divide-y"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    let rawWasherData = [];
+    let chemicalMaster = {};
+
+    // Chart instances
+    let chartUsers, chartMachines;
+
+    // Helper: Ekstrak kapasitas dari nama mesin (Misal: "Washer 50 Kg" -> 50)
+    function extractCapacity(machineName) {
+      if (!machineName) return 0;
+      const match = machineName.match(/\d+/);
+      return match ? parseFloat(match[0]) : 0;
+    }
+
+    // Load File CSV secara otomatis
+    async function initDashboard() {
+      try {
+        // Load Master Chemical Data
+        Papa.parse('./MASTER_CHEMICAL_Washer_Log_MASTER_CHEMICAL.csv', {
+          download: true,
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            results.data.forEach(row => {
+              const name = row['Chemical Name'] || row['Chemical'] || row['Name'];
+              const price = parseFloat(row['Price per ml'] || row['Price/ml'] || row['Harga per ml'] || 0);
+              if (name) chemicalMaster[name.trim()] = price;
+            });
+            
+            // Load Washer Log Data setelah master berhasil dimuat
+            loadWasherLogs();
+          }
+        });
+      } catch (err) {
+        console.error("Gagal membaca file CSV. Pastikan file berada di folder server lokal yang sama.", err);
+      }
+    }
+
+    function loadWasherLogs() {
+      Papa.parse('./MASTER_CHEMICAL_Washer_Log_WASHER_LOG.csv', {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+          rawWasherData = results.data;
+          
+          // Render data pertama kali
+          processAndRender(rawWasherData);
+        }
+      });
+    }
+
+    function processAndRender(data) {
+      let totalKg = 0;
+      let userMap = {};
+      let machineMap = {};
+      let programMap = {};
+      let chemicalVolumeMap = {};
+
+      data.forEach(row => {
+        // Deteksi kolom dinamis
+        const machine = row['Machine'] || row['Mesin'] || 'Unknown Machine';
+        const user = row['User'] || row['Operator'] || row['Nama'] || 'Unknown User';
+        const program = row['Program'] || row['Wash Program'] || 'Unknown Program';
+        
+        // Kapasitas diambil otomatis berdasarkan angka di Nama Mesin
+        const capacity = extractCapacity(machine);
+        totalKg += capacity;
+
+        // Total per Operator
+        userMap[user] = (userMap[user] || 0) + capacity;
+
+        // Total per Mesin
+        machineMap[machine] = (machineMap[machine] || 0) + capacity;
+
+        // Hitung Program Pencucian
+        programMap[program] = (programMap[program] || 0) + 1;
+
+        // Hitung Chemical (Mencari semua kolom berakhiran 'ml' atau ber-label Chemical)
+        Object.keys(row).forEach(key => {
+          if (key.toLowerCase().includes('ml') || key.toLowerCase().includes('chem')) {
+            const val = parseFloat(row[key]) || 0;
+            const chemName = key.replace(/[\(\)]/g, '').replace(/ml/i, '').trim();
+            if (val > 0) {
+              chemicalVolumeMap[chemName] = (chemicalVolumeMap[chemName] || 0) + val;
+            }
+          }
+        });
+      });
+
+      // Update KPI Cards
+      document.getElementById('totalWeight').innerText = totalKg.toLocaleString('id-ID') + ' Kg';
+      document.getElementById('totalLogs').innerText = data.length.toLocaleString('id-ID');
+
+      // Render Charts & Tables
+      renderTopUsersChart(userMap);
+      renderMachinesChart(machineMap);
+      renderProgramTable(programMap);
+      renderChemicalTable(chemicalVolumeMap);
+    }
+
+    function renderTopUsersChart(userMap) {
+      const sortedUsers = Object.entries(userMap)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+
+      const labels = sortedUsers.map(item => item[0]);
+      const values = sortedUsers.map(item => item[1]);
+
+      if (chartUsers) chartUsers.destroy();
+
+      const ctx = document.getElementById('chartTopUsers').getContext('2d');
+      chartUsers = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Total Pencucian (Kg)',
+            data: values,
+            backgroundColor: '#3b82f6',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function renderMachinesChart(machineMap) {
+      const labels = Object.keys(machineMap);
+      const values = Object.values(machineMap);
+
+      if (chartMachines) chartMachines.destroy();
+
+      const ctx = document.getElementById('chartMachines').getContext('2d');
+      chartMachines = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Total pencucian per Mesin (Kg)',
+            data: values,
+            backgroundColor: '#10b981',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    function renderProgramTable(programMap) {
+      const sorted = Object.entries(programMap).sort((a, b) => b[1] - a[1]);
+      const tbody = document.getElementById('tablePrograms');
+      tbody.innerHTML = '';
+
+      sorted.forEach(([program, count], index) => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="py-2.5 font-semibold text-gray-500">#${index + 1}</td>
+            <td class="py-2.5 font-medium">${program}</td>
+            <td class="py-2.5 text-right font-bold text-gray-700">${count.toLocaleString('id-ID')} Kali</td>
+          </tr>
+        `;
+      });
+    }
+
+    function renderChemicalTable(chemicalVolumeMap) {
+      let totalCostAll = 0;
+      const chemicalData = Object.entries(chemicalVolumeMap).map(([name, volume]) => {
+        // Cari harga per ml dari file Master Chemical
+        const unitPrice = chemicalMaster[name] || 0;
+        const totalCost = volume * unitPrice;
+        totalCostAll += totalCost;
+
+        return { name, volume, totalCost };
+      });
+
+      // Sort ranking berdasarkan volume terbanyak
+      chemicalData.sort((a, b) => b.volume - a.volume);
+
+      document.getElementById('totalChemicalCost').innerText = 'Rp ' + Math.round(totalCostAll).toLocaleString('id-ID');
+
+      const tbody = document.getElementById('tableChemicals');
+      tbody.innerHTML = '';
+
+      chemicalData.forEach((item, index) => {
+        tbody.innerHTML += `
+          <tr>
+            <td class="py-2.5 font-semibold text-gray-500">#${index + 1}</td>
+            <td class="py-2.5 font-medium">${item.name}</td>
+            <td class="py-2.5 text-right">${item.volume.toLocaleString('id-ID')} ml</td>
+            <td class="py-2.5 text-right font-semibold text-emerald-600">Rp ${Math.round(item.totalCost).toLocaleString('id-ID')}</td>
+          </tr>
+        `;
+      });
+    }
+
+    // Logic Event Listener Filter Tanggal
+    document.getElementById('btnFilter').addEventListener('click', () => {
+      const startDateVal = document.getElementById('startDate').value;
+      const endDateVal = document.getElementById('endDate').value;
+
+      if (!startDateVal && !endDateVal) {
+        processAndRender(rawWasherData);
+        return;
+      }
+
+      const filtered = rawWasherData.filter(row => {
+        const rawDate = row['Date'] || row['Tanggal'] || row['Timestamp'];
+        if (!rawDate) return true;
+
+        const rowDate = new Date(rawDate);
+        const start = startDateVal ? new Date(startDateVal) : new Date('1970-01-01');
+        const end = endDateVal ? new Date(endDateVal + 'T23:59:59') : new Date('2099-12-31');
+
+        return rowDate >= start && rowDate <= end;
+      });
+
+      processAndRender(filtered);
+    });
+
+    // Jalankan Dashboard saat halaman selesai diload
+    window.addEventListener('DOMContentLoaded', initDashboard);
+  </script>
+</body>
+</html>
