@@ -8,6 +8,16 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700&display=swap" rel="stylesheet">
 <style>body{background:#f6f7fb;font-family:Inter,sans-serif}.card{background:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.04);border:1px solid #eef2f7}.kpi{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 50%,#2563eb 100%)}.scroll-x{overflow-x:auto}canvas{max-width:100%!important}</style>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="WasherLog">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
 </head>
 <body>
 <script>
@@ -16,7 +26,7 @@ var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyI622a8p094zuv
 
 <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-6">
   <div class="flex justify-between items-center mb-4">
-    <div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log v6.4</h1><p class="text-xs text-slate-500">No Button • KPI Jelas • All Chemical Tampil</p></div>
+    <div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log v6.5 PWA</h1><p class="text-xs text-slate-500">No Button • KPI Jelas • All Chemical Tampil</p></div>
     <div class="flex items-center gap-2"><span id="statusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span id="statusText" class="text-xs text-slate-500">Loading</span></div>
   </div>
   <div id="errorBox" class="hidden card p-4 mb-4 bg-red-50 border-red-200 text-red-700 text-xs"></div>
@@ -193,5 +203,69 @@ function drawCharts(data, avgDaily){
 }
 window.onload = loadDashboard;
 </script>
+
+<!-- PWA Install Prompt -->
+<div id="installBanner" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-[360px] bg-slate-900 text-white rounded-2xl p-4 shadow-2xl z-50 flex items-center justify-between gap-3">
+  <div class="flex items-center gap-3">
+    <img src="icon-192.png" class="w-10 h-10 rounded-xl">
+    <div><p class="text-sm font-bold">Install Washer Log</p><p class="text-[11px] text-white/60">Jadi aplikasi di HP / Laptop</p></div>
+  </div>
+  <div class="flex gap-2">
+    <button onclick="dismissInstall()" class="text-white/60 text-xs px-2">Nanti</button>
+    <button id="installBtn" class="bg-white text-slate-900 px-4 py-2 rounded-full text-xs font-bold">Install</button>
+  </div>
+</div>
+
+<script>
+// Service Worker Registration
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').then(function(reg){
+      console.log('SW registered', reg.scope);
+    }).catch(function(err){ console.log('SW fail', err); });
+  });
+}
+
+// Install prompt
+let deferredPrompt = null;
+const installBanner = document.getElementById('installBanner');
+const installBtn = document.getElementById('installBtn');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBanner.classList.remove('hidden');
+});
+
+installBtn.addEventListener('click', async () => {
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const choice = await deferredPrompt.userChoice;
+  console.log('Install choice', choice);
+  deferredPrompt = null;
+  installBanner.classList.add('hidden');
+});
+
+function dismissInstall(){
+  installBanner.classList.add('hidden');
+}
+
+// iOS hint
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+if(isIOS && !isStandalone){
+  setTimeout(()=>{ 
+    if(!localStorage.getItem('pwa-ios-hint-dismissed')){
+      const b = document.getElementById('installBanner');
+      b.querySelector('p.font-bold').innerText='Add to Home Screen';
+      b.querySelector('p.text-\[11px\]').innerText='Tap Share > Add to Home Screen di Safari';
+      document.getElementById('installBtn').innerText='OK';
+      document.getElementById('installBtn').onclick=()=>{b.classList.add('hidden'); localStorage.setItem('pwa-ios-hint-dismissed','1');};
+      b.classList.remove('hidden');
+    }
+  }, 3000);
+}
+</script>
+
 </body>
 </html>
