@@ -1,0 +1,25 @@
+{
+  "name": "Washer Log v6.4 - Laundry Dashboard",
+  "short_name": "WasherLog",
+  "description": "Washer Log & Chemical Tracking - Average + Frekuensi + Machine Chem",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f6f7fb",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
