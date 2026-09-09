@@ -37,7 +37,6 @@ var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyI622a8p094zuv
       <div class="md:col-span-5"><label class="text-[11px] uppercase font-semibold text-slate-600">SELESAI 23:59:59</label><input type="date" id="endDate" value="2026-08-30" onchange="loadDashboard()" class="mt-1 w-full rounded-xl border px-4 py-2.5 text-sm font-semibold"></div>
       <div class="md:col-span-2"><label class="text-[11px] uppercase font-semibold text-transparent">reset</label><button onclick="resetFilter()" class="w-full border rounded-xl px-5 py-2.5 text-sm bg-white font-medium hover:bg-slate-50">Reset</button></div>
     </div>
-    <div class="mt-2 text-[11px] text-slate-400"><span id="rangeInfo"></span> | <a id="rawLink" href="#" target="_blank" class="text-blue-600 underline">Buka JSON langsung</a></div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-5">
@@ -93,11 +92,13 @@ async function loadDashboard(){
   var txt = document.getElementById('statusText');
   var errBox = document.getElementById('errorBox');
   var url = GOOGLE_SCRIPT_URL + '?action=getDashboardData&startDate=' + encodeURIComponent(s) + '&endDate=' + encodeURIComponent(e) + '&t=' + Date.now();
-  document.getElementById('rawLink').href = url;
+  var rawLinkEl = document.getElementById('rawLink');
+  if(rawLinkEl) rawLinkEl.href = url;
   dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
   txt.innerText = 'Loading...';
   errBox.classList.add('hidden');
-  document.getElementById('rangeInfo').innerText = s + ' 00:00:01 -> ' + e + ' 23:59:59';
+  var rangeInfoEl = document.getElementById('rangeInfo');
+  if(rangeInfoEl) rangeInfoEl.innerText = s + ' 00:00:01 -> ' + e + ' 23:59:59';
   try{
     var res = await fetch(url);
     var text = await res.text();
@@ -258,7 +259,7 @@ if(isIOS && !isStandalone){
     if(!localStorage.getItem('pwa-ios-hint-dismissed')){
       const b = document.getElementById('installBanner');
       b.querySelector('p.font-bold').innerText='Add to Home Screen';
-      b.querySelector('p.text-\[11px\]').innerText='Tap Share > Add to Home Screen di Safari';
+      b.querySelector('p.text-\\[11px\\]').innerText='Tap Share > Add to Home Screen di Safari';
       document.getElementById('installBtn').innerText='OK';
       document.getElementById('installBtn').onclick=()=>{b.classList.add('hidden'); localStorage.setItem('pwa-ios-hint-dismissed','1');};
       b.classList.remove('hidden');
