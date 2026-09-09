@@ -3,28 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Washer Log v6.2 - Fixed Syntax</title>
+<title>Washer Log v6.3 FIXED</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Plus+Jakarta+Sans:wght@700&display=swap" rel="stylesheet">
-<style>body{background:#f6f7fb;font-family:Inter}.card{background:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.04);border:1px solid #eef2f7}.kpi{background:radial-gradient(120% at 0% 0%, #4f46e5 0%, #2563eb 55%, #0ea5e9 100%)}.scroll-x{overflow-x:auto}canvas{max-width:100%!important}</style>
+<style>body{background:#f6f7fb;font-family:Inter,sans-serif}.card{background:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.04);border:1px solid #eef2f7}.kpi{background:radial-gradient(120% at 0% 0%, #4f46e5 0%, #2563eb 55%, #0ea5e9 100%)}.scroll-x{overflow-x:auto}canvas{max-width:100%!important}</style>
 </head>
 <body>
 <script>
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyI622a8p094zuvCeLmG8_TV9bITWt5BZp6LsAtpfu25TtjsY8P3dZXp-tJufOg5fwt/exec";
+var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyI622a8p094zuvCeLmG8_TV9bITWt5BZp6LsAtpfu25TtjsY8P3dZXp-tJufOg5fwt/exec";
 </script>
+
 <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-6">
   <div class="flex justify-between items-center mb-4">
-    <div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log v6.2 - Fixed</h1><p class="text-xs text-slate-500">Garis Average + Frekuensi Staff + Konsumsi per Mesin</p></div>
+    <div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log v6.3 FIXED</h1><p class="text-xs text-slate-500">Syntax 100% clean - Average + Frekuensi + Machine Chem</p></div>
     <div class="flex items-center gap-2"><span id="statusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span id="statusText" class="text-xs text-slate-500">Loading</span></div>
   </div>
   <div id="errorBox" class="hidden card p-4 mb-4 bg-red-50 border-red-200 text-red-700 text-xs"></div>
 
   <div class="card p-4 mb-5">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-      <div class="md:col-span-3"><label class="text-[11px] uppercase font-semibold">Mulai 00:00:01</label><input type="date" id="startDate" class="mt-1 w-full rounded-xl border px-4 py-2.5 text-sm"></div>
-      <div class="md:col-span-3"><label class="text-[11px] uppercase font-semibold">Selesai 23:59:59</label><input type="date" id="endDate" class="mt-1 w-full rounded-xl border px-4 py-2.5 text-sm"></div>
+      <div class="md:col-span-3"><label class="text-[11px] uppercase font-semibold">Mulai 00:00:01</label><input type="date" id="startDate" value="2026-07-31" class="mt-1 w-full rounded-xl border px-4 py-2.5 text-sm"></div>
+      <div class="md:col-span-3"><label class="text-[11px] uppercase font-semibold">Selesai 23:59:59</label><input type="date" id="endDate" value="2026-08-30" class="mt-1 w-full rounded-xl border px-4 py-2.5 text-sm"></div>
       <div class="md:col-span-6 flex gap-2"><button onclick="loadDashboard()" class="flex-1 bg-slate-900 text-white rounded-xl py-3 text-sm font-semibold">Tampilkan Full Day</button><button onclick="resetFilter()" class="border rounded-xl px-5 py-3 text-sm bg-white">Reset</button></div>
     </div>
     <div class="mt-2 text-[11px] text-slate-400"><span id="rangeInfo"></span> | <a id="rawLink" href="#" target="_blank" class="text-blue-600 underline">Buka JSON langsung</a></div>
@@ -48,100 +48,117 @@ const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyI622a8p094z
   </div>
 
   <div class="card p-4 md:p-6">
-    <div class="flex flex-col md:flex-row justify-between gap-2 mb-4"><div><h3 class="font-['Plus_Jakarta_Sans'] font-semibold text-[18px]">Konsumsi per Mesin per Chemical</h3><p class="text-xs text-slate-500">ml & Rupiah - butuh Apps Script V6</p></div><select id="machineSelect" onchange="renderMachineChem()" class="border rounded-xl px-4 py-2 text-sm bg-white min-w-[260px]"></select></div>
+    <div class="flex flex-col md:flex-row justify-between gap-2 mb-4"><div><h3 class="font-['Plus_Jakarta_Sans'] font-semibold text-[18px]">Konsumsi per Mesin per Chemical</h3><p class="text-xs text-slate-500">ml dan Rupiah</p></div><select id="machineSelect" onchange="renderMachineChem()" class="border rounded-xl px-4 py-2 text-sm bg-white min-w-[260px]"></select></div>
     <div id="machineChemContent">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5"><div class="lg:col-span-7"><div class="scroll-x"><div class="min-w-[560px] overflow-hidden rounded-xl border"><table class="w-full text-sm"><thead class="bg-blue-600 text-white text-[10px] uppercase"><tr><th class="text-left px-4 py-3">Chemical</th><th class="text-right px-4 py-3">ml</th><th class="text-right px-4 py-3">Rp</th><th class="text-right px-4 py-3">%</th></tr></thead><tbody id="machineChemTable"></tbody></table></div></div></div><div class="lg:col-span-5"><div class="bg-slate-50 rounded-2xl p-4 border border-dashed"><div class="grid grid-cols-2 gap-3"><div><p class="text-[10px] uppercase">ml</p><div class="h-[160px]"><canvas id="machineChemMlChart"></canvas></div></div><div><p class="text-[10px] uppercase">Rp</p><div class="h-[160px]"><canvas id="machineChemRpChart"></canvas></div></div></div><div id="machineChemInsight" class="mt-3 text-xs bg-white p-3 rounded-xl border"></div></div></div></div>
       <div class="mt-6"><h4 class="text-sm font-semibold mb-3">Overview Semua Mesin</h4><div id="allMachineCards" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div></div>
     </div>
   </div>
-
-  <pre id="rawDebug" class="mt-5 bg-white border rounded-xl p-3 text-[10px] max-h-[200px] overflow-auto"></pre>
 </div>
 
 <script>
-let charts={}, currentData=null;
-const fmtKg=v=>v.toLocaleString('id-ID')+' Kg';
-const fmtRp=v=>'Rp '+Math.round(v).toLocaleString('id-ID');
-const fmtMl=v=>Math.round(v).toLocaleString('id-ID')+' ml';
+var charts = {};
+var currentData = null;
 
-document.getElementById('startDate').value='2026-07-31';
-document.getElementById('endDate').value='2026-08-30';
+function fmtKg(v){ return Number(v).toLocaleString('id-ID') + ' Kg'; }
+function fmtRp(v){ return 'Rp ' + Math.round(Number(v)).toLocaleString('id-ID'); }
+function fmtMl(v){ return Math.round(Number(v)).toLocaleString('id-ID') + ' ml'; }
 
 async function loadDashboard(){
-  const s=document.getElementById('startDate').value;
-  const e=document.getElementById('endDate').value;
-  const dot=document.getElementById('statusDot');
-  const txt=document.getElementById('statusText');
-  const errBox=document.getElementById('errorBox');
-  const url=GOOGLE_SCRIPT_URL+'?action=getDashboardData&startDate='+encodeURIComponent(s)+'&endDate='+encodeURIComponent(e)+'&t='+Date.now();
-  document.getElementById('rawLink').href=url;
-  dot.className='w-2 h-2 rounded-full bg-amber-400 animate-pulse';
-  txt.innerText='Loading...';
+  var s = document.getElementById('startDate').value;
+  var e = document.getElementById('endDate').value;
+  var dot = document.getElementById('statusDot');
+  var txt = document.getElementById('statusText');
+  var errBox = document.getElementById('errorBox');
+  var url = GOOGLE_SCRIPT_URL + '?action=getDashboardData&startDate=' + encodeURIComponent(s) + '&endDate=' + encodeURIComponent(e) + '&t=' + Date.now();
+  document.getElementById('rawLink').href = url;
+  dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+  txt.innerText = 'Loading...';
   errBox.classList.add('hidden');
-  document.getElementById('rangeInfo').innerText=s+' 00:00:01 -> '+e+' 23:59:59';
+  document.getElementById('rangeInfo').innerText = s + ' 00:00:01 -> ' + e + ' 23:59:59';
   try{
-    const res=await fetch(url);
-    const text=await res.text();
-    document.getElementById('rawDebug').innerText=text.slice(0,2000);
-    if(text.trim().startsWith('<')){ throw new Error('Response HTML bukan JSON. Deployment belum Anyone.'); }
-    const data=JSON.parse(text);
+    var res = await fetch(url);
+    var text = await res.text();
+    if(text.trim().charAt(0) === '<'){ throw new Error('Response HTML bukan JSON - deployment belum Anyone'); }
+    var data = JSON.parse(text);
     if(data.error){ throw new Error(data.error); }
-    currentData=data;
+    currentData = data;
     render(data);
-    dot.className='w-2 h-2 rounded-full bg-emerald-500';
-    txt.innerText='Live';
+    dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+    txt.innerText = 'Live';
   }catch(err){
-    dot.className='w-2 h-2 rounded-full bg-red-500';
-    txt.innerText='Error';
-    errBox.innerText='Gagal: '+err.message;
+    dot.className = 'w-2 h-2 rounded-full bg-red-500';
+    txt.innerText = 'Error';
+    errBox.innerText = 'Gagal: ' + err.message;
     errBox.classList.remove('hidden');
-    console.error(err);
   }
 }
-function resetFilter(){ document.getElementById('startDate').value='2026-07-31'; document.getElementById('endDate').value='2026-08-30'; loadDashboard(); }
+
+function resetFilter(){
+  document.getElementById('startDate').value = '2026-07-31';
+  document.getElementById('endDate').value = '2026-08-30';
+  loadDashboard();
+}
 
 function render(data){
-  document.getElementById('totalKg').innerText=(data.totalWashKg||0).toLocaleString('id-ID');
-  const avgDaily=data.avgDaily!==undefined?data.avgDaily:(data.dailyTrend&&data.dailyTrend.length?data.totalWashKg/data.dailyTrend.length:0);
-  document.getElementById('avgDailyText').innerText=avgDaily.toLocaleString('id-ID',{maximumFractionDigits:0})+' Kg';
-  const days=data.dailyTrend?data.dailyTrend.length:1;
-  document.getElementById('avgKg').innerText=(data.totalWashKg/days).toFixed(0)+' Kg';
-  const totalMl=data.chemRank?data.chemRank.reduce((a,b)=>a+(b.ml||0),0):0;
-  const totalCost=data.chemRank?data.chemRank.reduce((a,b)=>a+(b.cost||0),0):0;
-  document.getElementById('totalChemMl').innerText=totalMl?fmtMl(totalMl):'-';
-  document.getElementById('totalCost').innerText=totalCost?fmtRp(totalCost):'-';
-
-  const topStaff=data.topStaff||[];
-  const maxKg=Math.max.apply(null, topStaff.map(function(x){return x.kg||0;}).concat([1]));
-  let staffHtml='';
-  for(let i=0;i<topStaff.length;i++){
-    const it=topStaff[i];
-    const kg=it.kg||0;
-    const count=it.count||0;
-    const avg=count?kg/count:0;
-    const pct=data.totalWashKg?(kg/data.totalWashKg*100).toFixed(1):'0';
-    staffHtml+='<tr class="hover:bg-slate-50"><td class="px-4 py-2.5 text-slate-400">'+(i+1)+'</td>';
-    staffHtml+='<td class="px-4 py-2.5"><div class="font-medium">'+it.name+'</div><div class="h-1.5 bg-slate-100 rounded-full mt-1"><div class="h-1.5 bg-slate-900 rounded-full" style="width:'+(kg/maxKg*100).toFixed(0)+'%;"></div></div></td>';
-    staffHtml+='<td class="px-4 py-2.5 text-right font-semibold">'+fmtKg(kg)+'</td>';
-    staffHtml+='<td class="px-4 py-2.5 text-center"><span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs font-semibold">'+(count?count+'x':'-')+'</span></td>';
-    staffHtml+='<td class="px-4 py-2.5 text-right">'+(count?fmtKg(avg):'-')+'</td>';
-    staffHtml+='<td class="px-4 py-2.5 text-right text-slate-500">'+pct+'%</td></tr>';
+  document.getElementById('totalKg').innerText = Number(data.totalWashKg||0).toLocaleString('id-ID');
+  var avgDaily = data.avgDaily;
+  if(avgDaily === undefined){
+    var len = data.dailyTrend ? data.dailyTrend.length : 1;
+    avgDaily = len ? data.totalWashKg / len : 0;
   }
-  document.getElementById('topStaffTable').innerHTML=staffHtml||'<tr><td colspan="6" class="text-center py-6 text-slate-400">Tidak ada data</td></tr>';
+  document.getElementById('avgDailyText').innerText = Number(avgDaily).toLocaleString('id-ID', {maximumFractionDigits:0}) + ' Kg';
+  var days = data.dailyTrend ? data.dailyTrend.length : 1;
+  document.getElementById('avgKg').innerText = (data.totalWashKg/days).toFixed(0) + ' Kg';
+  var totalMl = 0; var totalCost = 0;
+  if(data.chemRank){
+    for(var i=0;i<data.chemRank.length;i++){ totalMl += (data.chemRank[i].ml||0); totalCost += (data.chemRank[i].cost||0); }
+  }
+  document.getElementById('totalChemMl').innerText = totalMl ? fmtMl(totalMl) : '-';
+  document.getElementById('totalCost').innerText = totalCost ? fmtRp(totalCost) : '-';
 
-  let machineListHtml='';
-  (data.machineRank||[]).forEach(function(m){ machineListHtml+='<div class="flex justify-between text-xs"><span>'+m.machine+'</span><span class="font-semibold">'+fmtKg(m.kg)+'</span></div>'; });
-  document.getElementById('machineList').innerHTML=machineListHtml;
+  var topStaff = data.topStaff || [];
+  var maxKg = 1;
+  for(var i=0;i<topStaff.length;i++){ if(topStaff[i].kg > maxKg) maxKg = topStaff[i].kg; }
+  var staffHtml = '';
+  for(var i=0;i<topStaff.length;i++){
+    var it = topStaff[i];
+    var kg = it.kg||0;
+    var count = it.count||0;
+    var avg = count ? kg/count : 0;
+    var pct = data.totalWashKg ? (kg/data.totalWashKg*100).toFixed(1) : '0';
+    var width = (kg/maxKg*100).toFixed(0);
+    staffHtml += '<tr class="hover:bg-slate-50"><td class="px-4 py-2.5 text-slate-400">' + (i+1) + '</td>';
+    staffHtml += '<td class="px-4 py-2.5"><div class="font-medium">' + it.name + '</div><div class="h-1.5 bg-slate-100 rounded-full mt-1"><div class="h-1.5 bg-slate-900 rounded-full" style="width:' + width + '%"></div></div></td>';
+    staffHtml += '<td class="px-4 py-2.5 text-right font-semibold">' + fmtKg(kg) + '</td>';
+    staffHtml += '<td class="px-4 py-2.5 text-center"><span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs font-semibold">' + (count?count+'x':'-') + '</span></td>';
+    staffHtml += '<td class="px-4 py-2.5 text-right">' + (count?fmtKg(avg):'-') + '</td>';
+    staffHtml += '<td class="px-4 py-2.5 text-right text-slate-500">' + pct + '%</td></tr>';
+  }
+  document.getElementById('topStaffTable').innerHTML = staffHtml || '<tr><td colspan="6" class="text-center py-6 text-slate-400">Tidak ada data</td></tr>';
 
-  let chemHtml='';
-  (data.chemRank||[]).forEach(function(c,i){ chemHtml+='<tr class="'+(i===0?'bg-amber-50/60':'')+'"><td class="px-3 py-2">'+(i+1)+'</td><td class="px-3 py-2">'+c.name+'</td><td class="px-3 py-2 text-right">'+fmtMl(c.ml)+'</td><td class="px-3 py-2 text-right font-semibold">'+fmtRp(c.cost)+'</td></tr>'; });
-  document.getElementById('chemTable').innerHTML=chemHtml;
+  var machineListHtml = '';
+  var mr = data.machineRank || [];
+  for(var i=0;i<mr.length;i++){ machineListHtml += '<div class="flex justify-between text-xs"><span>' + mr[i].machine + '</span><span class="font-semibold">' + fmtKg(mr[i].kg) + '</span></div>'; }
+  document.getElementById('machineList').innerHTML = machineListHtml;
+
+  var chemHtml = '';
+  var cr = data.chemRank || [];
+  for(var i=0;i<cr.length;i++){
+    var c = cr[i];
+    var cls = i===0 ? 'bg-amber-50/60' : '';
+    chemHtml += '<tr class="' + cls + '"><td class="px-3 py-2">' + (i+1) + '</td><td class="px-3 py-2">' + c.name + '</td><td class="px-3 py-2 text-right">' + fmtMl(c.ml) + '</td><td class="px-3 py-2 text-right font-semibold">' + fmtRp(c.cost) + '</td></tr>';
+  }
+  document.getElementById('chemTable').innerHTML = chemHtml;
 
   if(data.machineChemList && data.machineChemList.length){
-    const sel=document.getElementById('machineSelect');
-    let selHtml='';
-    data.machineChemList.forEach(function(m){ selHtml+='<option value="'+m.machine+'">'+m.machine+' - '+fmtRp(m.totalCost)+'</option>'; });
-    sel.innerHTML=selHtml;
+    var sel = document.getElementById('machineSelect');
+    var selHtml = '';
+    for(var i=0;i<data.machineChemList.length;i++){
+      var mm = data.machineChemList[i];
+      selHtml += '<option value="' + mm.machine + '">' + mm.machine + ' - ' + fmtRp(mm.totalCost) + '</option>';
+    }
+    sel.innerHTML = selHtml;
     renderMachineChem();
     renderAllMachineCards();
   }
@@ -151,59 +168,91 @@ function render(data){
 
 function renderMachineChem(){
   if(!currentData || !currentData.machineChemList) return;
-  const machineName=document.getElementById('machineSelect').value || currentData.machineChemList[0].machine;
-  const machineData=currentData.machineChemList.find(function(m){return m.machine===machineName;});
+  var sel = document.getElementById('machineSelect');
+  var machineName = sel.value || currentData.machineChemList[0].machine;
+  var machineData = null;
+  for(var i=0;i<currentData.machineChemList.length;i++){ if(currentData.machineChemList[i].machine===machineName){ machineData=currentData.machineChemList[i]; break; } }
   if(!machineData) return;
-  let tableHtml='';
-  machineData.chemicals.forEach(function(c){
-    const pct=machineData.totalCost?(c.cost/machineData.totalCost*100).toFixed(1):0;
-    tableHtml+='<tr><td class="px-4 py-2.5 font-medium">'+c.name+'</td><td class="px-4 py-2.5 text-right">'+fmtMl(c.ml)+'</td><td class="px-4 py-2.5 text-right font-semibold">'+fmtRp(c.cost)+'</td><td class="px-4 py-2.5 text-right"><span class="bg-slate-100 px-2 py-1 rounded-full text-[11px]">'+pct+'%</span></td></tr>';
-  });
-  document.getElementById('machineChemTable').innerHTML=tableHtml;
-  document.getElementById('machineChemInsight').innerHTML='Mesin <b>'+machineName+'</b> total <b>'+fmtMl(machineData.totalMl)+'</b> = <b>'+fmtRp(machineData.totalCost)+'</b><br>Terboros: <b>'+(machineData.chemicals[0]?machineData.chemicals[0].name:'-')+'</b>';
+  var tableHtml = '';
+  for(var i=0;i<machineData.chemicals.length;i++){
+    var c = machineData.chemicals[i];
+    var pct = machineData.totalCost ? (c.cost/machineData.totalCost*100).toFixed(1) : 0;
+    tableHtml += '<tr><td class="px-4 py-2.5 font-medium">' + c.name + '</td><td class="px-4 py-2.5 text-right">' + fmtMl(c.ml) + '</td><td class="px-4 py-2.5 text-right font-semibold">' + fmtRp(c.cost) + '</td><td class="px-4 py-2.5 text-right"><span class="bg-slate-100 px-2 py-1 rounded-full text-[11px]">' + pct + '%</span></td></tr>';
+  }
+  document.getElementById('machineChemTable').innerHTML = tableHtml;
+  document.getElementById('machineChemInsight').innerHTML = 'Mesin <b>' + machineName + '</b> total <b>' + fmtMl(machineData.totalMl) + '</b> = <b>' + fmtRp(machineData.totalCost) + '</b><br>Terboros: <b>' + (machineData.chemicals[0]?machineData.chemicals[0].name:'-') + '</b>';
 
-  if(charts.mMl) charts.mMl.destroy();
-  if(charts.mRp) charts.mRp.destroy();
-  charts.mMl=new Chart(document.getElementById('machineChemMlChart'),{type:'bar',data:{labels:machineData.chemicals.slice(0,5).map(function(c){return c.name.replace('ES ','');}),datasets:[{data:machineData.chemicals.slice(0,5).map(function(c){return c.ml;}),backgroundColor:'#0ea5e9',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}}}});
-  charts.mRp=new Chart(document.getElementById('machineChemRpChart'),{type:'doughnut',data:{labels:machineData.chemicals.slice(0,5).map(function(c){return c.name;}),datasets:[{data:machineData.chemicals.slice(0,5).map(function(c){return c.cost;}),backgroundColor:['#2563eb','#10b981','#f59e0b','#ef4444','#6366f1'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{boxWidth:8,font:{size:8}}}}});
+  if(charts.mMl && charts.mMl.destroy) charts.mMl.destroy();
+  if(charts.mRp && charts.mRp.destroy) charts.mRp.destroy();
+
+  var top5 = machineData.chemicals.slice(0,5);
+  var labelsMl = []; var dataMl = [];
+  var labelsRp = []; var dataRp = [];
+  for(var i=0;i<top5.length;i++){ labelsMl.push(top5[i].name.replace('ES ','').slice(0,15)); dataMl.push(top5[i].ml); labelsRp.push(top5[i].name.slice(0,15)); dataRp.push(top5[i].cost); }
+
+  charts.mMl = new Chart(document.getElementById('machineChemMlChart'), {
+    type: 'bar',
+    data: { labels: labelsMl, datasets: [{ data: dataMl, backgroundColor: '#0ea5e9', borderRadius: 6 }] },
+    options: { responsive:true, maintainAspectRatio:false, indexAxis:'y', plugins:{ legend:{ display:false } } }
+  });
+
+  charts.mRp = new Chart(document.getElementById('machineChemRpChart'), {
+    type: 'doughnut',
+    data: { labels: labelsRp, datasets: [{ data: dataRp, backgroundColor: ['#2563eb','#10b981','#f59e0b','#ef4444','#6366f1'], borderWidth:0 }] },
+    options: { responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{ legend:{ position:'bottom', labels:{ boxWidth:8, font:{size:8} } } } }
+  });
 }
 
 function renderAllMachineCards(){
   if(!currentData || !currentData.machineChemList) return;
-  let cardsHtml='';
-  currentData.machineChemList.forEach(function(m){
-    let inner='';
-    m.chemicals.slice(0,3).forEach(function(c){ inner+='<div class="flex justify-between text-[11px]"><span class="truncate">'+c.name+'</span><span>'+fmtMl(c.ml)+'</span></div>'; });
-    if(m.chemicals.length>3){ inner+='<p class="text-[10px] text-slate-400">+'+(m.chemicals.length-3)+' lainnya</p>'; }
-    cardsHtml+='<div class="border rounded-xl p-3 bg-white"><div class="flex justify-between"><p class="font-semibold text-sm">'+m.machine+'</p><span class="text-[10px] bg-slate-900 text-white px-2 py-0.5 rounded-full">'+m.chemicals.length+' chem</span></div><p class="text-[11px] text-slate-500 mt-1">'+fmtMl(m.totalMl)+' • '+fmtRp(m.totalCost)+'</p><div class="mt-2 space-y-1">'+inner+'</div></div>';
-  });
-  document.getElementById('allMachineCards').innerHTML=cardsHtml;
+  var cardsHtml = '';
+  for(var i=0;i<currentData.machineChemList.length;i++){
+    var m = currentData.machineChemList[i];
+    var inner = '';
+    var lim = Math.min(3, m.chemicals.length);
+    for(var j=0;j<lim;j++){ inner += '<div class="flex justify-between text-[11px]"><span class="truncate">' + m.chemicals[j].name + '</span><span>' + fmtMl(m.chemicals[j].ml) + '</span></div>'; }
+    if(m.chemicals.length>3){ inner += '<p class="text-[10px] text-slate-400">+' + (m.chemicals.length-3) + ' lainnya</p>'; }
+    cardsHtml += '<div class="border rounded-xl p-3 bg-white"><div class="flex justify-between"><p class="font-semibold text-sm">' + m.machine + '</p><span class="text-[10px] bg-slate-900 text-white px-2 py-0.5 rounded-full">' + m.chemicals.length + ' chem</span></div><p class="text-[11px] text-slate-500 mt-1">' + fmtMl(m.totalMl) + ' • ' + fmtRp(m.totalCost) + '</p><div class="mt-2 space-y-1">' + inner + '</div></div>';
+  }
+  document.getElementById('allMachineCards').innerHTML = cardsHtml;
 }
 
 function drawCharts(data, avgDaily){
-  Object.keys(charts).forEach(function(k){ if(k.startsWith('daily')||k==='machine'){ if(charts[k] && charts[k].destroy) charts[k].destroy(); } });
-  const isMobile=window.innerWidth<768;
-  const dailyLabels=data.dailyTrend?data.dailyTrend.map(function(d){return d.date.slice(5);}):[];
-  const dailyVals=data.dailyTrend?data.dailyTrend.map(function(d){return d.kg||0;}):[];
-  const avgVals=dailyLabels.map(function(){return avgDaily;});
+  if(charts.daily && charts.daily.destroy) charts.daily.destroy();
+  if(charts.machine && charts.machine.destroy) charts.machine.destroy();
 
-  charts.daily=new Chart(document.getElementById('dailyChart'),{
-    type:'line',
-    data:{labels:dailyLabels,datasets:[
-      {label:'Kg / Hari',data:dailyVals,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.12)',fill:true,tension:0.4,borderWidth:2.5,pointRadius:0},
-      {label:'Average',data:avgVals,borderColor:'#ef4444',borderDash:[6,4],borderWidth:2,pointRadius:0,fill:false}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:isMobile?6:12}},y:{grid:{color:'#f1f5f9'}}}}
+  var isMobile = window.innerWidth < 768;
+  var dailyLabels = []; var dailyVals = [];
+  if(data.dailyTrend){
+    for(var i=0;i<data.dailyTrend.length;i++){ dailyLabels.push(data.dailyTrend[i].date.slice(5)); dailyVals.push(data.dailyTrend[i].kg||0); }
+  }
+  var avgVals = [];
+  for(var i=0;i<dailyLabels.length;i++){ avgVals.push(avgDaily); }
+
+  charts.daily = new Chart(document.getElementById('dailyChart'), {
+    type: 'line',
+    data: {
+      labels: dailyLabels,
+      datasets: [
+        { label: 'Kg / Hari', data: dailyVals, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.12)', fill:true, tension:0.4, borderWidth:2.5, pointRadius:0 },
+        { label: 'Average', data: avgVals, borderColor: '#ef4444', borderDash:[6,4], borderWidth:2, pointRadius:0, fill:false }
+      ]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:true, position:'bottom', labels:{ boxWidth:10, font:{size:10} } } }, scales:{ x:{ grid:{ display:false }, ticks:{ maxTicksLimit: isMobile?6:12 } }, y:{ grid:{ color:'#f1f5f9' } } } }
   });
 
-  charts.machine=new Chart(document.getElementById('machineChart'),{
-    type:'bar',
-    data:{labels:(data.machineRank||[]).map(function(m){return m.machine;}),datasets:[{data:(data.machineRank||[]).map(function(m){return m.kg;}),backgroundColor:'#2563eb',borderRadius:6}]},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}}}
+  var mLabels = []; var mVals = [];
+  var mr = data.machineRank || [];
+  for(var i=0;i<mr.length;i++){ mLabels.push(mr[i].machine); mVals.push(mr[i].kg); }
+
+  charts.machine = new Chart(document.getElementById('machineChart'), {
+    type: 'bar',
+    data: { labels: mLabels, datasets: [{ data: mVals, backgroundColor: '#2563eb', borderRadius:6 }] },
+    options: { responsive:true, maintainAspectRatio:false, indexAxis:'y', plugins:{ legend:{ display:false } } }
   });
 }
 
-window.onload=loadDashboard;
+window.onload = loadDashboard;
 </script>
 </body>
 </html>
