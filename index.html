@@ -3,182 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Washer Log & Chemical Tracking</title>
+<title>Washer Log v6 - Average + Frekuensi + Machine Chem</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@700&display=swap" rel="stylesheet">
-<style>
-body{background:#f6f7fb; font-family:Inter, sans-serif}
-.card{background:#fff; border-radius:16px; box-shadow:0 8px 24px rgba(15,23,42,.04); border:1px solid #eef2f7}
-@media(min-width:768px){ .card{border-radius:20px} }
-.kpi{background:radial-gradient(120% 120% at 0% 0%, #4f46e5 0%, #2563eb 55%, #0ea5e9 100%)}
-.scroll-x{overflow-x:auto; -webkit-overflow-scrolling:touch}
-canvas{max-width:100% !important}
-</style>
+<style>body{background:#f6f7fb; font-family:Inter} .card{background:#fff; border-radius:20px; box-shadow:0 8px 24px rgba(0,0,0,.04); border:1px solid #eef2f7} .kpi{background:radial-gradient(120% at 0% 0%, #4f46e5 0%, #2563eb 55%, #0ea5e9 100%)} .scroll-x{overflow-x:auto} canvas{max-width:100% !important}</style>
 </head>
 <body>
 
-<!-- ================= LINK GOOGLESHEET - GANTI DISINI SAJA ================= -->
 <script>
-// GANTI DENGAN URL WEB APP KAMU YANG DEPLOY ANYONE
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz4U4Ud1Ha328tHSFF4W34yw_ED0aaohzeTnlx7W-fzvb36oJO0Y1LGtaSVgt50gHw-/exec";
-// Contoh: const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFeDsa37qoKrL9gRrja4eIRkdmv-xMYewd92Mpr19aDkWyIG08RAEz0nrnr8Dycy4g/exec";
+// ========== GANTI URL DISINI ==========
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyI622a8p094zuvCeLmG8_TV9bITWt5BZp6LsAtpfu25TtjsY8P3dZXp-tJufOg5fwt/exec";
 </script>
-<!-- ========================================================================= -->
 
-<div class="max-w-[1440px] mx-auto px-4 md:px-6 py-5 md:py-8">
-  <!-- Header -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-5">
-    <div>
-      <h1 class="font-['Plus_Jakarta_Sans'] text-[22px] md:text-[28px] font-bold leading-tight">Washer Log & Chemical Tracking</h1>
-      <p class="text-slate-500 text-[12px] md:text-sm mt-1">Monitoring volume, staff, mesin, program & biaya chemical • Full Day 00:00:01-23:59:59</p>
-      <p id="debugInfo" class="text-[10px] text-slate-400 mt-1"></p>
-    </div>
-    <div class="flex items-center gap-2 shrink-0">
-      <span id="statusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-      <span id="statusText" class="text-[11px] md:text-xs text-slate-500">Loading</span>
-    </div>
+<div class="max-w-[1440px] mx-auto px-4 md:px-6 py-6">
+  <div class="flex justify-between items-center mb-4">
+    <div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log & Chemical Tracking v6</h1><p class="text-xs text-slate-500">+ Garis Average + Frekuensi Staff + Konsumsi per Mesin per Chemical</p><p id="debugInfo" class="text-[10px] text-slate-400"></p></div>
+    <div class="flex gap-2 items-center"><span id="statusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span id="statusText" class="text-xs text-slate-500">Loading</span></div>
   </div>
 
-  <div id="errorBox" class="hidden card p-4 mb-4 bg-red-50 border-red-200 text-red-700 text-xs leading-relaxed break-words"></div>
+  <div id="errorBox" class="hidden card p-4 mb-4 bg-red-50 border-red-200 text-red-700 text-xs"></div>
 
-  <!-- Filter -->
-  <div class="card p-4 md:p-5 mb-5">
+  <div class="card p-4 mb-5">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-      <div class="md:col-span-3">
-        <label class="text-[10px] md:text-[11px] font-bold tracking-widest uppercase text-slate-500">Tanggal Mulai</label>
-        <input type="date" id="startDate" class="mt-1.5 w-full rounded-xl border border-slate-200 px-4 py-2.5 md:py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500">
-        <span class="text-[9px] text-slate-400">Diambil dari 00:00:01</span>
-      </div>
-      <div class="md:col-span-3">
-        <label class="text-[10px] md:text-[11px] font-bold tracking-widest uppercase text-slate-500">Tanggal Selesai</label>
-        <input type="date" id="endDate" class="mt-1.5 w-full rounded-xl border border-slate-200 px-4 py-2.5 md:py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500">
-        <span class="text-[9px] text-slate-400">Sampai 23:59:59</span>
-      </div>
-      <div class="md:col-span-6 flex gap-2">
-        <button onclick="loadDashboard()" class="flex-1 bg-slate-900 hover:bg-black text-white rounded-xl px-6 py-2.5 md:py-3 text-sm font-semibold transition"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i>Tampilkan Data</button>
-        <button onclick="resetFilter()" class="bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl px-5 py-2.5 md:py-3 text-sm font-semibold"><i class="fa-solid fa-rotate"></i></button>
-      </div>
+      <div class="md:col-span-3"><label class="text-[11px] uppercase font-semibold text-slate-500">Tanggal Mulai</label><input type="date" id="startDate" class="mt-1 w-full rounded-xl border px-4 py-2.5 text-sm"></div>
+      <div class="md:col-span-3"><label class="text-[11px] uppercase font-semibold text-slate-500">Tanggal Selesai</label><input type="date" id="endDate" class="mt-1 w-full rounded-xl border px-4 py-2.5 text-sm"></div>
+      <div class="md:col-span-6 flex gap-2"><button onclick="loadDashboard()" class="flex-1 bg-slate-900 text-white rounded-xl py-3 text-sm font-semibold">Tampilkan</button><button onclick="resetFilter()" class="border rounded-xl px-5 py-3 text-sm">Reset</button></div>
     </div>
-    <div class="mt-3 text-[10px] md:text-[11px] text-slate-400 flex gap-3"><span id="rangeInfo">-</span><span id="rowInfo"></span></div>
+    <div class="mt-2 text-[11px] text-slate-400"><span id="rangeInfo"></span></div>
   </div>
 
-  <!-- KPI + Daily Trend -->
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5 mb-5">
-    <div class="lg:col-span-5">
-      <div class="kpi rounded-[20px] md:rounded-[24px] p-5 md:p-7 text-white relative overflow-hidden h-full min-h-[210px]">
-        <div class="absolute -right-10 -top-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-        <div class="relative z-10">
-          <p class="text-white/70 text-[10px] tracking-[0.2em] uppercase font-semibold">Total Volume Pencucian</p>
-          <h2 id="totalKg" class="font-['Plus_Jakarta_Sans'] text-[38px] md:text-[52px] font-bold leading-none mt-3">-</h2>
-          <p class="text-white/80 text-[12px] md:text-sm mt-1">Kilogram linen tercuci</p>
-          <div class="mt-5 md:mt-6 grid grid-cols-3 gap-2 md:gap-3">
-            <div class="bg-white/15 backdrop-blur rounded-xl p-2.5 md:p-3"><p class="text-[8px] md:text-[10px] text-white/70 uppercase">Avg / Hari</p><p id="avgKg" class="font-semibold mt-1 text-[12px] md:text-sm truncate">-</p></div>
-            <div class="bg-white/15 backdrop-blur rounded-xl p-2.5 md:p-3"><p class="text-[8px] md:text-[10px] text-white/70 uppercase">Total Chemical</p><p id="totalChemMl" class="font-semibold mt-1 text-[12px] md:text-sm truncate">-</p></div>
-            <div class="bg-white/15 backdrop-blur rounded-xl p-2.5 md:p-3"><p class="text-[8px] md:text-[10px] text-white/70 uppercase">Total Biaya</p><p id="totalCost" class="font-semibold mt-1 text-[12px] md:text-sm truncate">-</p></div>
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-5">
+    <div class="lg:col-span-5"><div class="kpi rounded-[20px] p-6 text-white h-full"><p class="text-white/70 text-[10px] uppercase tracking-widest">Total Volume</p><h2 id="totalKg" class="text-4xl font-bold mt-2">-</h2><p class="text-white/80 text-xs mt-1">Avg harian: <span id="avgDailyText">-</span></p><div class="mt-5 grid grid-cols-3 gap-2"><div class="bg-white/15 rounded-xl p-3"><p class="text-[9px] uppercase">Avg/Hari</p><p id="avgKg" class="font-semibold text-sm mt-1">-</p></div><div class="bg-white/15 rounded-xl p-3"><p class="text-[9px] uppercase">Chem</p><p id="totalChemMl" class="font-semibold text-sm mt-1">-</p></div><div class="bg-white/15 rounded-xl p-3"><p class="text-[9px] uppercase">Biaya</p><p id="totalCost" class="font-semibold text-sm mt-1">-</p></div></div></div></div>
+    <div class="lg:col-span-7"><div class="card p-4 h-full"><div class="flex justify-between mb-3"><h3 class="text-sm font-semibold"><i class="fa-solid fa-chart-line mr-1 text-blue-600"></i>Trend Harian (Biru) + Average (Merah)</h3><span class="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded-full">00:00-23:59</span></div><div class="h-[260px]"><canvas id="dailyChart"></canvas></div></div></div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-5">
+    <!-- Staff dengan Frekuensi -->
+    <div class="lg:col-span-12 card p-4 md:p-5">
+      <div class="flex justify-between mb-4"><h3 class="font-['Plus_Jakarta_Sans'] font-semibold">Top 10 Staff Produktif + Frekuensi Pencucian</h3><div class="w-[110px] h-[40px]"><canvas id="staffChart"></canvas></div></div>
+      <div class="scroll-x"><div class="min-w-[640px] overflow-hidden rounded-xl border border-slate-100"><table class="w-full text-sm"><thead class="bg-slate-50 text-[10px] tracking-widest uppercase text-slate-500"><tr><th class="text-left px-4 py-2.5">#</th><th class="text-left px-4 py-2.5">Nama Staff</th><th class="text-right px-4 py-2.5">Total (Kg)</th><th class="text-center px-4 py-2.5">Frekuensi</th><th class="text-right px-4 py-2.5">Rata-rata / Cuci</th><th class="text-right px-4 py-2.5">%</th></tr></thead><tbody id="topStaffTable"></tbody></table></div></div>
+    </div>
+
+    <div class="lg:col-span-6 space-y-4">
+      <div class="card p-4"><h3 class="text-sm font-semibold mb-2">Per Mesin</h3><div class="h-[180px]"><canvas id="machineChart"></canvas></div><div id="machineList" class="mt-3 space-y-1 text-sm"></div></div>
+      <div class="card p-4"><h3 class="text-sm font-semibold mb-2">Ranking Program</h3><div class="h-[180px]"><canvas id="programChart"></canvas></div><div class="scroll-x mt-2"><div class="min-w-[380px]"><table class="w-full text-sm"><thead class="bg-slate-50 text-[10px] uppercase"><tr><th class="text-left px-3 py-2">Program</th><th class="text-center px-3 py-2">Freq</th><th class="text-right px-3 py-2">Kg</th></tr></thead><tbody id="programTable"></tbody></table></div></div></div>
+    </div>
+    <div class="lg:col-span-6 card p-4"><h3 class="font-semibold mb-3">Chemical Total</h3><div class="scroll-x"><div class="min-w-[480px]"><table class="w-full text-sm"><thead class="bg-slate-900 text-white text-[10px] uppercase"><tr><th class="px-3 py-3 text-left">#</th><th class="px-3 py-3 text-left">Nama</th><th class="px-3 py-3 text-right">ml</th><th class="px-3 py-3 text-right">Rp</th></tr></thead><tbody id="chemTable"></tbody></table></div></div><div class="mt-4 bg-slate-50 rounded-2xl p-4 border-dashed border"><div class="h-[220px]"><canvas id="chemPieChart"></canvas></div><div id="chemInsight" class="mt-3 text-xs bg-white p-3 rounded-xl border"></div></div></div>
+  </div>
+
+  <!-- NEW: Machine Chemical Breakdown -->
+  <div class="card p-4 md:p-6">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
+      <div><h3 class="font-['Plus_Jakarta_Sans'] font-semibold text-[18px]">Konsumsi per Mesin per Chemical</h3><p class="text-xs text-slate-500">Setiap mesin berapa ml & Rupiah chemical yang dipakai - sesuai gambar kamu</p></div>
+      <select id="machineSelect" onchange="renderMachineChem()" class="border rounded-xl px-4 py-2 text-sm bg-white"></select>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+      <div class="lg:col-span-7">
+        <div class="scroll-x"><div class="min-w-[560px] overflow-hidden rounded-xl border border-slate-100"><table class="w-full text-sm"><thead class="bg-blue-600 text-white text-[10px] uppercase tracking-widest"><tr><th class="text-left px-4 py-3">Chemical</th><th class="text-right px-4 py-3">Total (ml)</th><th class="text-right px-4 py-3">Total (Rupiah)</th><th class="text-right px-4 py-3">% Biaya</th></tr></thead><tbody id="machineChemTable"></tbody></table></div></div>
+      </div>
+      <div class="lg:col-span-5">
+        <div class="bg-slate-50 rounded-2xl p-4 border border-dashed">
+          <h4 class="text-sm font-semibold mb-2">Visual per Mesin</h4>
+          <div class="grid grid-cols-2 gap-3">
+            <div><p class="text-[10px] uppercase text-slate-500 mb-1">ml</p><div class="h-[160px]"><canvas id="machineChemMlChart"></canvas></div></div>
+            <div><p class="text-[10px] uppercase text-slate-500 mb-1">Rupiah</p><div class="h-[160px]"><canvas id="machineChemRpChart"></canvas></div></div>
           </div>
+          <div id="machineChemInsight" class="mt-3 text-xs bg-white p-3 rounded-xl border"></div>
         </div>
       </div>
     </div>
-    <div class="lg:col-span-7">
-      <div class="card p-4 md:p-5 h-full">
-        <div class="flex items-center justify-between mb-3"><h3 class="font-semibold text-[13px] md:text-sm"><i class="fa-solid fa-chart-line mr-2 text-blue-600"></i>Trend Harian Pencucian (Kg / Hari)</h3><span class="text-[9px] md:text-[10px] bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full">00:00-23:59</span></div>
-        <div class="relative w-full h-[200px] md:h-[260px]"><canvas id="dailyChart"></canvas></div>
-      </div>
+
+    <!-- All machines overview -->
+    <div class="mt-6">
+      <h4 class="text-sm font-semibold mb-3">Overview Semua Mesin</h4>
+      <div id="allMachineCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
     </div>
   </div>
 
-  <!-- Middle -->
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5 mb-5">
-    <div class="lg:col-span-6 card p-4 md:p-5">
-      <div class="flex items-center justify-between mb-4"><h3 class="font-['Plus_Jakarta_Sans'] font-semibold text-[14px] md:text-[15px]">Top 10 Staff Produktif</h3><div class="w-[90px] md:w-[110px] h-[36px] md:h-[44px]"><canvas id="staffChart"></canvas></div></div>
-      <div class="scroll-x -mx-4 md:mx-0 px-4 md:px-0"><div class="min-w-[480px] md:min-w-0 overflow-hidden rounded-xl border border-slate-100"><table class="w-full text-[12px] md:text-sm"><thead class="bg-slate-50 text-[10px] tracking-widest uppercase text-slate-500"><tr><th class="text-left px-3 md:px-4 py-2.5">#</th><th class="text-left px-3 md:px-4 py-2.5">Nama Staff</th><th class="text-right px-3 md:px-4 py-2.5">Total</th><th class="text-right px-3 md:px-4 py-2.5">%</th></tr></thead><tbody id="topStaffTable"></tbody></table></div></div>
-    </div>
-    <div class="lg:col-span-6 space-y-4 md:space-y-5">
-      <div class="card p-4 md:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-semibold text-[13px] md:text-sm">Pencucian Per Mesin</h3><span class="text-[10px] text-slate-400">by Kg</span></div><div class="relative w-full h-[160px] md:h-[180px]"><canvas id="machineChart"></canvas></div><div id="machineList" class="mt-4 space-y-2"></div></div>
-      <div class="card p-4 md:p-5"><div class="flex items-center justify-between mb-3"><h3 class="font-semibold text-[13px] md:text-sm">Ranking Program Pencucian</h3><i class="fa-solid fa-fire text-orange-400 text-xs"></i></div><div class="relative w-full h-[160px] md:h-[180px] mb-4"><canvas id="programChart"></canvas></div><div class="scroll-x -mx-4 md:mx-0 px-4 md:px-0"><div class="min-w-[380px] md:min-w-0 overflow-hidden rounded-xl border border-slate-100"><table class="w-full text-[12px] md:text-sm"><thead class="bg-slate-50 text-[10px] uppercase text-slate-500"><tr><th class="text-left px-3 md:px-4 py-2.5">Program</th><th class="text-center px-3 md:px-4 py-2.5">Freq</th><th class="text-right px-3 md:px-4 py-2.5">Kg</th></tr></thead><tbody id="programTable"></tbody></table></div></div></div>
-    </div>
-  </div>
-
-  <!-- Chemical -->
-  <div class="card p-4 md:p-6">
-    <h3 class="font-['Plus_Jakarta_Sans'] font-semibold text-[15px] md:text-[18px]">Ranking Penggunaan Chemical (Volume & Biaya)</h3>
-    <p class="text-[11px] text-slate-500 mt-1">Diurutkan biaya tertinggi • Full Day Filter</p>
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-5 mt-5">
-      <div class="lg:col-span-7 order-2 lg:order-1"><div class="scroll-x -mx-4 md:mx-0 px-4 md:px-0"><div class="min-w-[560px] md:min-w-0 overflow-hidden rounded-xl border border-slate-100"><table class="w-full text-[12px] md:text-sm"><thead class="bg-slate-900 text-white text-[10px] tracking-widest uppercase"><tr><th class="text-left px-3 md:px-4 py-3">#</th><th class="text-left px-3 md:px-4 py-3">Nama Chemical</th><th class="text-right px-3 md:px-4 py-3">Total ml</th><th class="text-right px-3 md:px-4 py-3">Total Rupiah</th></tr></thead><tbody id="chemTable"></tbody></table></div></div></div>
-      <div class="lg:col-span-5 order-1 lg:order-2"><div class="rounded-2xl bg-slate-50 p-4 md:p-5 border border-dashed"><h4 class="text-[13px] md:text-sm font-semibold mb-3">Biaya Chemical Breakdown</h4><div class="relative w-full h-[200px] md:h-[240px]"><canvas id="chemPieChart"></canvas></div><div id="chemInsight" class="mt-4 text-[11px] md:text-xs text-slate-600 bg-white rounded-xl p-3 border leading-relaxed"></div></div></div>
-    </div>
-  </div>
-
-  <p class="text-center text-[10px] text-slate-400 mt-8">Made Suastra • Washer Dashboard v5 Hardcoded URL • Full Day 00:00:01-23:59:59</p>
 </div>
 
 <script>
-let charts={};
+let charts={}, currentData=null;
 const fmtKg=v=>v.toLocaleString('id-ID')+' Kg', fmtRp=v=>'Rp '+Math.round(v).toLocaleString('id-ID'), fmtMl=v=>Math.round(v).toLocaleString('id-ID')+' ml';
-
-(function setDates(){
-  document.getElementById('startDate').value='2026-07-31';
-  document.getElementById('endDate').value='2026-08-30';
-})();
+(function(){ document.getElementById('startDate').value='2026-07-31'; document.getElementById('endDate').value='2026-08-30'; })();
 
 async function loadDashboard(){
   const s=document.getElementById('startDate').value, e=document.getElementById('endDate').value;
-  const dot=document.getElementById('statusDot'), txt=document.getElementById('statusText'), errBox=document.getElementById('errorBox');
-  
-  if(!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('YOUR_NEW_URL_HERE')){
-    errBox.innerHTML='❌ <b>GOOGLE_SCRIPT_URL belum diganti!</b><br>Buka file ini pakai Notepad, ganti baris:<br><code>const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/...../exec";</code><br>dengan URL Web App kamu yang sudah Deploy > Anyone.';
-    errBox.classList.remove('hidden');
-    dot.className='w-2 h-2 rounded-full bg-red-500'; txt.innerText='URL belum diset';
-    return;
-  }
-
-  dot.className='w-2 h-2 rounded-full bg-amber-400 animate-pulse'; txt.innerText='Loading...'; errBox.classList.add('hidden');
-  document.getElementById('rangeInfo').innerText=`${s} 00:00:01 → ${e} 23:59:59`;
-
+  const dot=document.getElementById('statusDot'), txt=document.getElementById('statusText');
+  if(!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('YOUR_URL_HERE')){ document.getElementById('errorBox').innerHTML='Ganti GOOGLE_SCRIPT_URL di HTML'; document.getElementById('errorBox').classList.remove('hidden'); return; }
+  dot.className='w-2 h-2 rounded-full bg-amber-400 animate-pulse'; txt.innerText='Loading...';
   try{
     const url=`${GOOGLE_SCRIPT_URL}?action=getDashboardData&startDate=${encodeURIComponent(s)}&endDate=${encodeURIComponent(e)}&t=${Date.now()}`;
-    const res=await fetch(url, {redirect:'follow'});
-    const txtRes=await res.text();
-    let data;
-    try{ data=JSON.parse(txtRes); }catch{ throw new Error('Response bukan JSON. Pastikan Deploy Anyone. Respon: '+txtRes.slice(0,250)); }
+    const res=await fetch(url); const t=await res.text(); const data=JSON.parse(t);
     if(data.error) throw new Error(data.error);
+    currentData=data;
+    document.getElementById('rangeInfo').innerText=`${s} 00:00:01 → ${e} 23:59:59`;
     render(data);
-    dot.className='w-2 h-2 rounded-full bg-emerald-500'; txt.innerText='Live • Github';
-    document.getElementById('rowInfo').innerText=`${data.filteredRows||0} baris`;
-    document.getElementById('debugInfo').innerText=`${data.debug?.tz||''} | ${data.debug?.start||''} → ${data.debug?.end||''}`;
-  }catch(err){
-    dot.className='w-2 h-2 rounded-full bg-red-500'; txt.innerText='Error';
-    errBox.innerHTML=err.message; errBox.classList.remove('hidden');
-  }
+    dot.className='w-2 h-2 rounded-full bg-emerald-500'; txt.innerText='Live';
+  }catch(err){ dot.className='w-2 h-2 rounded-full bg-red-500'; txt.innerText='Error'; const b=document.getElementById('errorBox'); b.innerHTML=err.message; b.classList.remove('hidden'); }
 }
-
 function resetFilter(){ document.getElementById('startDate').value='2026-07-31'; document.getElementById('endDate').value='2026-08-30'; loadDashboard(); }
 
 function render(data){
   document.getElementById('totalKg').innerText=data.totalWashKg.toLocaleString('id-ID');
+  document.getElementById('avgDailyText').innerText=fmtKg(data.avgDaily||0);
   const days=data.dailyTrend?.length||1;
   document.getElementById('avgKg').innerText=(data.totalWashKg/days).toFixed(0)+' Kg';
   const totalMl=data.chemRank.reduce((a,b)=>a+b.ml,0), totalCost=data.chemRank.reduce((a,b)=>a+b.cost,0);
   document.getElementById('totalChemMl').innerText=totalMl?fmtMl(totalMl):'-';
   document.getElementById('totalCost').innerText=totalCost?fmtRp(totalCost):'-';
   const maxKg=Math.max(...data.topStaff.map(x=>x.kg),1);
-  document.getElementById('topStaffTable').innerHTML=data.topStaff.map((it,i)=>`<tr class="hover:bg-slate-50"><td class="px-3 md:px-4 py-2.5 text-slate-400">${i+1}</td><td class="px-3 md:px-4 py-2.5"><div class="font-medium truncate max-w-[120px] md:max-w-none">${it.name}</div><div class="h-1 md:h-1.5 bg-slate-100 rounded-full mt-1"><div class="h-1 md:h-1.5 bg-slate-900 rounded-full" style="width:${(it.kg/maxKg*100).toFixed(0)}%"></div></div></td><td class="px-3 md:px-4 py-2.5 text-right font-semibold whitespace-nowrap">${fmtKg(it.kg)}</td><td class="px-3 md:px-4 py-2.5 text-right text-slate-500">${(it.kg/data.totalWashKg*100).toFixed(1)}%</td></tr>`).join('') || '<tr><td colspan=4 class="text-center py-4 text-slate-400">Tidak ada data</td></tr>';
-  document.getElementById('machineList').innerHTML=data.machineRank.map(m=>`<div class="flex justify-between text-[12px] md:text-sm"><span class="truncate pr-2">${m.machine}</span><span class="font-semibold shrink-0">${fmtKg(m.kg)}</span></div>`).join('');
-  document.getElementById('programTable').innerHTML=data.programRank.slice(0,8).map(p=>`<tr class="hover:bg-slate-50"><td class="px-3 md:px-4 py-2.5 truncate max-w-[140px]">${p.program}</td><td class="px-3 md:px-4 py-2.5 text-center"><span class="bg-slate-100 px-2 py-1 rounded-full text-[11px]">${p.count}x</span></td><td class="px-3 md:px-4 py-2.5 text-right">${fmtKg(p.totalKg)}</td></tr>`).join('');
-  document.getElementById('chemTable').innerHTML=data.chemRank.map((c,i)=>`<tr class="hover:bg-slate-50 ${i==0?'bg-amber-50/60':''}"><td class="px-3 md:px-4 py-2.5 text-slate-400">${i+1}</td><td class="px-3 md:px-4 py-2.5 font-medium">${c.name}</td><td class="px-3 md:px-4 py-2.5 text-right whitespace-nowrap">${fmtMl(c.ml)}</td><td class="px-3 md:px-4 py-2.5 text-right font-semibold whitespace-nowrap">${fmtRp(c.cost)}</td></tr>`).join('');
-  if(data.chemRank[0]) document.getElementById('chemInsight').innerHTML=`Chemical paling boros <b>${data.chemRank[0].name}</b> ${fmtRp(data.chemRank[0].cost)} (${(data.chemRank[0].cost/totalCost*100).toFixed(1)}% total).`;
+  document.getElementById('topStaffTable').innerHTML=data.topStaff.map((it,i)=>{
+    const avg = it.count ? it.kg/it.count : 0;
+    return `<tr class="hover:bg-slate-50"><td class="px-4 py-2.5 text-slate-400">${i+1}</td>
+      <td class="px-4 py-2.5"><div class="font-medium">${it.name}</div><div class="h-1.5 bg-slate-100 rounded-full mt-1"><div class="h-1.5 bg-slate-900 rounded-full" style="width:${(it.kg/maxKg*100).toFixed(0)}%"></div></div></td>
+      <td class="px-4 py-2.5 text-right font-semibold">${fmtKg(it.kg)}</td>
+      <td class="px-4 py-2.5 text-center"><span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs font-semibold">${it.count}x</span></td>
+      <td class="px-4 py-2.5 text-right">${fmtKg(avg)}</td>
+      <td class="px-4 py-2.5 text-right text-slate-500">${(it.kg/data.totalWashKg*100).toFixed(1)}%</td></tr>`;
+  }).join('');
+  document.getElementById('machineList').innerHTML=data.machineRank.map(m=>`<div class="flex justify-between text-xs"><span>${m.machine}</span><span class="font-semibold">${fmtKg(m.kg)}</span></div>`).join('');
+  document.getElementById('programTable').innerHTML=data.programRank.slice(0,8).map(p=>`<tr><td class="px-3 py-2">${p.program}</td><td class="px-3 py-2 text-center">${p.count}x</td><td class="px-3 py-2 text-right">${fmtKg(p.totalKg)}</td></tr>`).join('');
+  document.getElementById('chemTable').innerHTML=data.chemRank.map((c,i)=>`<tr class="${i==0?'bg-amber-50/60':''}"><td class="px-3 py-2">${i+1}</td><td class="px-3 py-2">${c.name}</td><td class="px-3 py-2 text-right">${fmtMl(c.ml)}</td><td class="px-3 py-2 text-right font-semibold">${fmtRp(c.cost)}</td></tr>`).join('');
+  if(data.chemRank[0]) document.getElementById('chemInsight').innerHTML=`Boros: <b>${data.chemRank[0].name}</b> ${fmtRp(data.chemRank[0].cost)}`;
+
+  // Fill machine select
+  const sel=document.getElementById('machineSelect');
+  sel.innerHTML=data.machineChemList.map(m=>`<option value="${m.machine}">${m.machine} - ${fmtRp(m.totalCost)}</option>`).join('');
+  renderMachineChem();
+  renderAllMachineCards();
+
   draw(data);
 }
+
+function renderMachineChem(){
+  if(!currentData) return;
+  const machineName=document.getElementById('machineSelect').value || currentData.machineChemList[0]?.machine;
+  if(!machineName) return;
+  const machineData=currentData.machineChemList.find(m=>m.machine===machineName);
+  if(!machineData) return;
+
+  document.getElementById('machineChemTable').innerHTML=machineData.chemicals.map(c=>{
+    const pct = machineData.totalCost ? (c.cost/machineData.totalCost*100).toFixed(1) : 0;
+    return `<tr><td class="px-4 py-2.5 font-medium">${c.name}</td><td class="px-4 py-2.5 text-right">${fmtMl(c.ml)}</td><td class="px-4 py-2.5 text-right font-semibold">${fmtRp(c.cost)}</td><td class="px-4 py-2.5 text-right"><span class="bg-slate-100 px-2 py-1 rounded-full text-[11px]">${pct}%</span></td></tr>`;
+  }).join('');
+
+  document.getElementById('machineChemInsight').innerHTML=`Mesin <b>${machineName}</b> total <b>${fmtMl(machineData.totalMl)}</b> senilai <b>${fmtRp(machineData.totalCost)}</b><br>Chemical terbanyak: <b>${machineData.chemicals[0]?.name||'-'}</b>`;
+
+  // Charts per machine
+  if(charts.mMl) charts.mMl.destroy(); if(charts.mRp) charts.mRp.destroy();
+  charts.mMl=new Chart(document.getElementById('machineChemMlChart'),{type:'bar',data:{labels:machineData.chemicals.slice(0,5).map(c=>c.name.replace('ES ','')),datasets:[{data:machineData.chemicals.slice(0,5).map(c=>c.ml), backgroundColor:'#0ea5e9', borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{display:false}}}}}});
+  charts.mRp=new Chart(document.getElementById('machineChemRpChart'),{type:'doughnut',data:{labels:machineData.chemicals.slice(0,5).map(c=>c.name),datasets:[{data:machineData.chemicals.slice(0,5).map(c=>c.cost),backgroundColor:['#2563eb','#10b981','#f59e0b','#ef4444','#6366f1'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{boxWidth:8,font:{size:8}}}}}});
+}
+
+function renderAllMachineCards(){
+  if(!currentData) return;
+  document.getElementById('allMachineCards').innerHTML=currentData.machineChemList.map(m=>{
+    return `<div class="border rounded-xl p-3 bg-white"><div class="flex justify-between items-start"><p class="font-semibold text-sm">${m.machine}</p><span class="text-[10px] bg-slate-900 text-white px-2 py-0.5 rounded-full">${m.chemicals.length} chem</span></div><p class="text-[11px] text-slate-500 mt-1">${fmtMl(m.totalMl)} • ${fmtRp(m.totalCost)}</p><div class="mt-2 space-y-1">${m.chemicals.slice(0,3).map(c=>`<div class="flex justify-between text-[11px]"><span class="truncate">${c.name}</span><span>${fmtMl(c.ml)}</span></div>`).join('')}${m.chemicals.length>3?`<p class="text-[10px] text-slate-400">+${m.chemicals.length-3} lainnya</p>`:''}</div></div>`;
+  }).join('');
+}
+
 function draw(data){
-  Object.values(charts).forEach(c=>c?.destroy());
+  Object.values(charts).forEach(c=>{ if(c && c.canvas && ['dailyChart','machineChart','programChart','staffChart','chemPieChart'].includes(c.canvas.id)) c.destroy(); });
   const isMobile=window.innerWidth<768;
-  charts.daily=new Chart(document.getElementById('dailyChart'),{type:'line',data:{labels:(data.dailyTrend||[]).map(d=>d.date.slice(5)),datasets:[{data:(data.dailyTrend||[]).map(d=>d.kg),borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.12)',fill:true,tension:0.4,borderWidth:2,pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:isMobile?5:10,font:{size:9}}},y:{grid:{color:'#f1f5f9'}}}}});
-  charts.machine=new Chart(document.getElementById('machineChart'),{type:'bar',data:{labels:data.machineRank.map(m=>m.machine.length>18&&isMobile?m.machine.slice(0,18)+'…':m.machine),datasets:[{data:data.machineRank.map(m=>m.kg),backgroundColor:'#2563eb',borderRadius:6,barThickness:isMobile?12:16}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{display:false}}}}});
-  charts.program=new Chart(document.getElementById('programChart'),{type:'doughnut',data:{labels:data.programRank.slice(0,5).map(p=>p.program),datasets:[{data:data.programRank.slice(0,5).map(p=>p.count),backgroundColor:['#0ea5e9','#6366f1','#10b981','#f59e0b','#ef4444'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}}}});
-  charts.staff=new Chart(document.getElementById('staffChart'),{type:'bar',data:{labels:data.topStaff.slice(0,5).map(s=>s.name.split(' ')[0]),datasets:[{data:data.topStaff.slice(0,5).map(s=>s.kg),backgroundColor:'#0f172a',borderRadius:4,barThickness:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}}});
-  charts.chem=new Chart(document.getElementById('chemPieChart'),{type:'pie',data:{labels:data.chemRank.map(c=>c.name),datasets:[{data:data.chemRank.map(c=>c.cost),backgroundColor:['#2563eb','#0ea5e9','#6366f1','#10b981','#f59e0b','#ef4444']}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:10,font:{size:9}}}}}});
+  // Daily with Average red line
+  const avg = data.avgDaily||0;
+  const avgData = data.dailyTrend.map(()=>avg);
+  charts.daily=new Chart(document.getElementById('dailyChart'),{
+    type:'line',
+    data:{
+      labels:data.dailyTrend.map(d=>d.date.slice(5)),
+      datasets:[
+        {label:'Kg / Hari', data:data.dailyTrend.map(d=>d.kg), borderColor:'#2563eb', backgroundColor:'rgba(37,99,235,0.12)', fill:true, tension:0.4, borderWidth:2.5, pointRadius:0},
+        {label:'Average '+fmtKg(avg), data:avgData, borderColor:'#ef4444', backgroundColor:'transparent', borderDash:[6,4], borderWidth:2, pointRadius:0, fill:false}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:true, position:'bottom', labels:{boxWidth:12, font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:isMobile?6:12,font:{size:9}}},y:{grid:{color:'#f1f5f9'}}}}
+  });
+  charts.machine=new Chart(document.getElementById('machineChart'),{type:'bar',data:{labels:data.machineRank.map(m=>m.machine),datasets:[{data:data.machineRank.map(m=>m.kg),backgroundColor:'#2563eb',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}}}});
+  charts.program=new Chart(document.getElementById('programChart'),{type:'doughnut',data:{labels:data.programRank.slice(0,5).map(p=>p.program),datasets:[{data:data.programRank.slice(0,5).map(p=>p.count),backgroundColor:['#0ea5e9','#6366f1','#10b981','#f59e0b','#ef4444'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%'}});
+  charts.staff=new Chart(document.getElementById('staffChart'),{type:'bar',data:{labels:data.topStaff.slice(0,5).map(s=>s.name.split(' ')[0]),datasets:[{data:data.topStaff.slice(0,5).map(s=>s.kg),backgroundColor:'#0f172a',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{display:false}}}});
+  charts.chem=new Chart(document.getElementById('chemPieChart'),{type:'pie',data:{labels:data.chemRank.map(c=>c.name),datasets:[{data:data.chemRank.map(c=>c.cost),backgroundColor:['#2563eb','#0ea5e9','#6366f1','#10b981','#f59e0b','#ef4444']}]},options:{responsive:true,maintainAspectRatio:false}});
 }
 window.onload=loadDashboard;
 </script>
