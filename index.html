@@ -90,9 +90,6 @@ var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwblyWT04bVAF7V
     <div class="flex flex-col md:flex-row justify-between gap-2 mb-4"><div><h3 class="font-['Plus_Jakarta_Sans'] font-bold text-[18px]">Konsumsi per Mesin per Chemical</h3><p class="text-xs text-slate-500">Semua chemical tampil lengkap</p></div><select id="machineSelect" onchange="renderMachineChem()" class="border rounded-xl px-4 py-2 text-sm bg-white min-w-[260px] font-medium"></select></div>
     <div id="machineChemContent">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5"><div class="lg:col-span-7"><div class="scroll-x"><div class="min-w-[560px] overflow-hidden rounded-xl border"><table class="w-full text-sm"><thead class="bg-blue-600 text-white text-[10px] uppercase tracking-widest"><tr><th class="text-left px-4 py-3">Chemical</th><th class="text-right px-4 py-3">ml</th><th class="text-right px-4 py-3">Rp</th><th class="text-right px-4 py-3">%</th></tr></thead><tbody id="machineChemTable"></tbody></table></div></div></div><div class="lg:col-span-5"><div class="bg-slate-50 rounded-2xl p-4 border border-dashed"><div class="grid grid-cols-2 gap-3"><div><p class="text-[10px] uppercase font-bold text-slate-500">ml</p><div class="h-[160px]"><canvas id="machineChemMlChart"></canvas></div></div><div><p class="text-[10px] uppercase font-bold text-slate-500">Rp</p><div class="h-[160px]"><canvas id="machineChemRpChart"></canvas></div></div></div><div id="machineChemInsight" class="mt-3 text-xs bg-white p-3 rounded-xl border"></div></div></div></div>
-    </div>
-  </div>
-</div>
 
 <script>
 var charts = {};
@@ -164,7 +161,7 @@ function render(data){
   }
   document.getElementById('topStaffTable').innerHTML = staffHtml;
 
-// --- NEW: Ranking Program Pencucian ---
+  // --- Ranking Program Pencucian dari kolom E ---
   var programRank = data.programRank || [];
   var programHtml = '';
   var colors = ['#2563eb','#7c3aed','#0ea5e9','#10b981','#f59e0b','#ef4444'];
@@ -178,7 +175,7 @@ function render(data){
     var rankClass = isTop3 ? 'font-bold text-slate-900' : 'text-slate-400';
     programHtml += '<tr class="'+rowClass+' border-b border-slate-50 last:border-0">';
     programHtml += '<td class="px-4 py-3.5 '+rankClass+'">'+rankLabel+'</td>';
-    programHtml += '<td class="px-4 py-3.5"><div class="flex items-center gap-2.5"><span class="w-2 h-2 rounded-full" style="background:'+dotColor+'"></span><span class="font-medium text-slate-900 '+(isTop3?'':'')+'">'+pName+'</span></div></td>';
+    programHtml += '<td class="px-4 py-3.5"><div class="flex items-center gap-2.5"><span class="w-2 h-2 rounded-full" style="background:'+dotColor+'"></span><span class="font-medium text-slate-900">'+pName+'</span></div></td>';
     programHtml += '<td class="px-4 py-3.5 text-right font-semibold text-slate-900">'+p.count+' Kali</td>';
     programHtml += '</tr>';
   }
@@ -213,22 +210,7 @@ function renderMachineChem(){
   charts.mMl = new Chart(document.getElementById('machineChemMlChart'), { type: 'bar', data: { labels: labelsMl, datasets: [{ data: dataMl, backgroundColor: '#0ea5e9', borderRadius: 6 }] }, options: { responsive:true, maintainAspectRatio:false, indexAxis:'y', plugins:{ legend:{ display:false } } } });
   charts.mRp = new Chart(document.getElementById('machineChemRpChart'), { type: 'doughnut', data: { labels: labelsRp, datasets: [{ data: dataRp, backgroundColor: ['#2563eb','#10b981','#f59e0b','#ef4444','#6366f1'], borderWidth:0 }] }, options: { responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{ legend:{ position:'bottom', labels:{ boxWidth:8, font:{size:8} } } } } });
 }
-function renderAllMachineCards(){ return; // removed per request - cards disilang merah dihilangkan
-  // original code kept disabled below
-  if(false){
-  if(!currentData || !currentData.machineChemList) return;
-  var cardsHtml = '';
-  for(var i=0;i<currentData.machineChemList.length;i++){
-    var m = currentData.machineChemList[i];
-    var inner = '';
-    for(var j=0;j<m.chemicals.length;j++){
-      inner += '<div class="flex justify-between text-[11px] border-b border-slate-50 py-1"><span class="truncate pr-2 font-medium">' + m.chemicals[j].name + '</span><span class="font-semibold">' + fmtMl(m.chemicals[j].ml) + '</span></div>';
-    }
-    cardsHtml += '<div class="border rounded-xl p-4 bg-white shadow-sm"><div class="flex justify-between items-start mb-2"><p class="font-bold text-sm">' + m.machine + '</p><span class="text-[10px] bg-slate-900 text-white px-2.5 py-1 rounded-full">' + m.chemicals.length + ' chem</span></div><p class="text-[11px] text-slate-500 mb-2 font-medium">' + fmtMl(m.totalMl) + ' • ' + fmtRp(m.totalCost) + '</p><div class="space-y-0">' + inner + '</div></div>';
-  }
-  document.getElementById('allMachineCards').innerHTML = cardsHtml;
-}}
-}
+function renderAllMachineCards(){ return; }
 function drawCharts(data, avgDaily){
   if(charts.daily && charts.daily.destroy) charts.daily.destroy();
   if(charts.machine && charts.machine.destroy) charts.machine.destroy();
