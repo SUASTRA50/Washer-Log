@@ -21,12 +21,12 @@
 </head>
 <body>
 <script>
-var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyI622a8p094zuvCeLmG8_TV9bITWt5BZp6LsAtpfu25TtjsY8P3dZXp-tJufOg5fwt/exec";
+var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwblyWT04bVAF7VYxHBOdMiJLS4xROMsAvs3BUbzPPwxGkuDvxXk8nLKP_9V1ynbZc3/exec";
 </script>
 
 <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-6">
   <div class="flex justify-between items-center mb-4">
-    <div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log</h1><p class="text-xs text-slate-500">Washer • Machine • Chemicals • Expenses</p></div>
+    <div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log</h1><p class="text-xs text-slate-500">No Button • KPI Jelas • All Chemical Tampil</p></div>
     <div class="flex items-center gap-2"><span id="statusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span id="statusText" class="text-xs text-slate-500">Loading</span></div>
   </div>
   <div id="errorBox" class="hidden card p-4 mb-4 bg-red-50 border-red-200 text-red-700 text-xs"></div>
@@ -58,22 +58,39 @@ var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyI622a8p094zuv
   </div>
 
   <div class="card p-4 md:p-5 mb-5">
-    <h3 class="font-['Plus_Jakarta_Sans'] font-bold mb-4">Top 10 Staff + Frekuensi Pencucian</h3>
+    <h3 class="font-['Plus_Jakarta_Sans'] font-bold mb-4">Frekuensi Pencucian By Staff</h3>
     <div class="scroll-x"><div class="min-w-[720px] overflow-hidden rounded-xl border border-slate-100">
       <table class="w-full text-sm"><thead class="bg-slate-50 text-[10px] uppercase font-bold"><tr><th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Nama</th><th class="text-right px-4 py-3">Total Kg</th><th class="text-center px-4 py-3">Frekuensi</th><th class="text-right px-4 py-3">Rata / Cuci</th><th class="text-right px-4 py-3">%</th></tr></thead><tbody id="topStaffTable"></tbody></table>
     </div></div>
   </div>
 
+  <div class="card p-4 md:p-5 mb-5">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="font-['Plus_Jakarta_Sans'] font-bold text-[15px]">Ranking Program Pencucian</h3>
+      <span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Frekuensi Penggunaan</span>
+    </div>
+    <div class="overflow-hidden rounded-xl border border-slate-100">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-50 text-[10px] uppercase font-bold text-slate-500">
+          <tr><th class="text-left px-4 py-3 w-[60px]">Rank</th><th class="text-left px-4 py-3">Nama Program</th><th class="text-right px-4 py-3">Frekuensi Penggunaan</th></tr>
+        </thead>
+        <tbody id="programRankTable">
+          <tr><td colspan="3" class="text-center py-8 text-slate-400 text-xs">Loading program...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-5">
-    <div class="lg:col-span-6 card p-4"><h3 class="text-sm font-bold mb-2">KG Per Mesin</h3><div class="h-[200px]"><canvas id="machineChart"></canvas></div><div id="machineList" class="mt-4 space-y-1.5 text-sm"></div></div>
-    <div class="lg:col-span-6 card p-4"><h3 class="text-sm font-bold mb-3">Volume Pemakaian dan Biaya Chemical Total</h3><div class="scroll-x"><div class="min-w-[480px]"><table class="w-full text-sm"><thead class="bg-slate-900 text-white text-[10px] uppercase"><tr><th class="px-3 py-3 text-left">#</th><th class="px-3 py-3 text-left">Nama</th><th class="px-3 py-3 text-right">ml</th><th class="px-3 py-3 text-right">Rp</th></tr></thead><tbody id="chemTable"></tbody></table></div></div></div>
+    <div class="lg:col-span-6 card p-4"><h3 class="text-sm font-bold mb-2">Per Mesin</h3><div class="h-[200px]"><canvas id="machineChart"></canvas></div><div id="machineList" class="mt-4 space-y-1.5 text-sm"></div></div>
+    <div class="lg:col-span-6 card p-4"><h3 class="text-sm font-bold mb-3">Chemical Total</h3><div class="scroll-x"><div class="min-w-[480px]"><table class="w-full text-sm"><thead class="bg-slate-900 text-white text-[10px] uppercase"><tr><th class="px-3 py-3 text-left">#</th><th class="px-3 py-3 text-left">Nama</th><th class="px-3 py-3 text-right">ml</th><th class="px-3 py-3 text-right">Rp</th></tr></thead><tbody id="chemTable"></tbody></table></div></div></div>
   </div>
 
   <div class="card p-4 md:p-6">
-    <div class="flex flex-col md:flex-row justify-between gap-2 mb-4"><div><h3 class="font-['Plus_Jakarta_Sans'] font-bold text-[18px]">Konsumsi Masing-Masing Chemical </h3><p class="text-xs text-slate-500">Semua chemical tampil lengkap</p></div><select id="machineSelect" onchange="renderMachineChem()" class="border rounded-xl px-4 py-2 text-sm bg-white min-w-[260px] font-medium"></select></div>
+    <div class="flex flex-col md:flex-row justify-between gap-2 mb-4"><div><h3 class="font-['Plus_Jakarta_Sans'] font-bold text-[18px]">Konsumsi per Mesin per Chemical</h3><p class="text-xs text-slate-500">Semua chemical tampil lengkap</p></div><select id="machineSelect" onchange="renderMachineChem()" class="border rounded-xl px-4 py-2 text-sm bg-white min-w-[260px] font-medium"></select></div>
     <div id="machineChemContent">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5"><div class="lg:col-span-7"><div class="scroll-x"><div class="min-w-[560px] overflow-hidden rounded-xl border"><table class="w-full text-sm"><thead class="bg-blue-600 text-white text-[10px] uppercase tracking-widest"><tr><th class="text-left px-4 py-3">Chemical</th><th class="text-right px-4 py-3">ml</th><th class="text-right px-4 py-3">Rp</th><th class="text-right px-4 py-3">%</th></tr></thead><tbody id="machineChemTable"></tbody></table></div></div></div><div class="lg:col-span-5"><div class="bg-slate-50 rounded-2xl p-4 border border-dashed"><div class="grid grid-cols-2 gap-3"><div><p class="text-[10px] uppercase font-bold text-slate-500">ml</p><div class="h-[160px]"><canvas id="machineChemMlChart"></canvas></div></div><div><p class="text-[10px] uppercase font-bold text-slate-500">Rp</p><div class="h-[160px]"><canvas id="machineChemRpChart"></canvas></div></div></div><div id="machineChemInsight" class="mt-3 text-xs bg-white p-3 rounded-xl border"></div></div></div></div>
-      <div class="mt-6"><h4 class="text-sm font-bold mb-3">Overview Penggunaan Chemical Semua Mesin</h4><div id="allMachineCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
+      <div class="mt-6"><h4 class="text-sm font-bold mb-3">Pemakaian setiap Chemical di Setiap Mesin</h4><div id="allMachineCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
     </div>
   </div>
 </div>
@@ -147,6 +164,29 @@ function render(data){
     staffHtml += '<td class="px-4 py-2.5 text-right text-slate-500">' + pct + '%</td></tr>';
   }
   document.getElementById('topStaffTable').innerHTML = staffHtml;
+
+// --- NEW: Ranking Program Pencucian ---
+  var programRank = data.programRank || [];
+  var programHtml = '';
+  var colors = ['#2563eb','#7c3aed','#0ea5e9','#10b981','#f59e0b','#ef4444'];
+  for(var i=0;i<programRank.length;i++){
+    var p = programRank[i];
+    var pName = p.name || p.program || 'Unknown';
+    var rankLabel = '#'+(i+1);
+    var dotColor = colors[i % colors.length];
+    var isTop3 = i < 3;
+    var rowClass = isTop3 ? 'bg-slate-50/50' : 'hover:bg-slate-50';
+    var rankClass = isTop3 ? 'font-bold text-slate-900' : 'text-slate-400';
+    programHtml += '<tr class="'+rowClass+' border-b border-slate-50 last:border-0">';
+    programHtml += '<td class="px-4 py-3.5 '+rankClass+'">'+rankLabel+'</td>';
+    programHtml += '<td class="px-4 py-3.5"><div class="flex items-center gap-2.5"><span class="w-2 h-2 rounded-full" style="background:'+dotColor+'"></span><span class="font-medium text-slate-900 '+(isTop3?'':'')+'">'+pName+'</span></div></td>';
+    programHtml += '<td class="px-4 py-3.5 text-right font-semibold text-slate-900">'+p.count+' Kali</td>';
+    programHtml += '</tr>';
+  }
+  var progEl = document.getElementById('programRankTable');
+  if(progEl){
+    progEl.innerHTML = programHtml || '<tr><td colspan="3" class="text-center py-8 text-slate-400 text-xs">Tidak ada data program</td></tr>';
+  }
 
   var machineListHtml = ''; var mr = data.machineRank || []; for(var i=0;i<mr.length;i++){ machineListHtml += '<div class="flex justify-between text-xs"><span>' + mr[i].machine + '</span><span class="font-semibold">' + fmtKg(mr[i].kg) + '</span></div>'; }
   document.getElementById('machineList').innerHTML = machineListHtml;
