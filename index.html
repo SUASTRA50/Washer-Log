@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Washer Log</title>
+<title>Washer Log - No Button + Clear KPI + Show All Chem</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700&display=swap" rel="stylesheet">
@@ -26,7 +26,7 @@ var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwblyWT04bVAF7V
 
 <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-6">
   <div class="flex justify-between items-center mb-4">
-    <div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log</h1><p class="text-xs text-slate-500">Operation • Machine • Chemical • Expenses</p></div>
+    <div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log</h1><p class="text-xs text-slate-500">No Button • KPI Jelas • All Chemical Tampil</p></div>
     <div class="flex items-center gap-2"><span id="statusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span id="statusText" class="text-xs text-slate-500">Loading</span></div>
   </div>
   <div id="errorBox" class="hidden card p-4 mb-4 bg-red-50 border-red-200 text-red-700 text-xs"></div>
@@ -59,8 +59,8 @@ var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwblyWT04bVAF7V
 
   <div class="card p-4 md:p-5 mb-5">
     <h3 class="font-['Plus_Jakarta_Sans'] font-bold mb-4">Top 10 Staff + Frekuensi Pencucian</h3>
-    <div class="scroll-x"><div class="min-w-[720px] overflow-hidden rounded-xl border border-slate-100">
-      <table class="w-full text-sm"><thead class="bg-slate-50 text-[10px] uppercase font-bold"><tr><th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Nama</th><th class="text-right px-4 py-3">Total Kg</th><th class="text-center px-4 py-3">Frekuensi</th><th class="text-right px-4 py-3">Rata / Cuci</th><th class="text-right px-4 py-3">%</th></tr></thead><tbody id="topStaffTable"></tbody></table>
+    <div class="scroll-x"><div class="min-w-[640px] overflow-hidden rounded-xl border border-slate-100">
+      <table class="w-full text-sm"><thead class="bg-slate-50 text-[10px] uppercase font-bold"><tr><th class="text-left px-4 py-3">#</th><th class="text-left px-4 py-3">Nama</th><th class="text-right px-4 py-3">Total Kg</th><th class="text-center px-4 py-3">Frekuensi</th><th class="text-right px-4 py-3">%</th></tr></thead><tbody id="topStaffTable"></tbody></table>
     </div></div>
   </div>
 
@@ -156,7 +156,6 @@ function render(data){
     staffHtml += '<td class="px-4 py-2.5"><div class="font-medium">' + it.name + '</div><div class="h-1.5 bg-slate-100 rounded-full mt-1"><div class="h-1.5 bg-slate-900 rounded-full" style="width:' + width + '%"></div></div></td>';
     staffHtml += '<td class="px-4 py-2.5 text-right font-semibold">' + fmtKg(kg) + '</td>';
     staffHtml += '<td class="px-4 py-2.5 text-center"><span class="bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full text-xs font-semibold">' + (count?count+'x':'-') + '</span></td>';
-    staffHtml += '<td class="px-4 py-2.5 text-right">' + (count?fmtKg(avg):'-') + '</td>';
     staffHtml += '<td class="px-4 py-2.5 text-right text-slate-500">' + pct + '%</td></tr>';
   }
   document.getElementById('topStaffTable').innerHTML = staffHtml;
