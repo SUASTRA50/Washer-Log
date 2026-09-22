@@ -10,7 +10,7 @@
 <style>body{background:#f6f7fb;font-family:Inter,sans-serif}.card{background:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.04);border:1px solid #eef2f7}.kpi{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 50%,#2563eb 100%)}canvas{max-width:100%!important}.quick-active{outline:2px solid #0f172a;outline-offset:2px}</style>
 </head>
 <body>
-<script>var GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycbwblyWT04bVAF7VYxHBOdMiJLS4xROMsAvs3BUbzPPwxGkuDvxXk8nLKP_9V1ynbZc3/exec";</script>
+<script>var GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycbxtnXZM2WGutTH2I0p258Ssbg4IpwrnjvkGlTCDY1vCEGWwWH_rkvQlstjyNIYWLvjQ/exec";</script>
 
 <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-6">
 <div class="flex justify-between items-center mb-4"><div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log</h1><p class="text-xs text-slate-500">Machines • Chemicals • Expenses</p></div><div class="flex items-center gap-2"><span id="statusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span id="statusText" class="text-xs text-slate-500">Loading</span></div></div>
@@ -18,21 +18,21 @@
 
 <div class="card p-3 md:p-4 mb-5">
 <div class="grid grid-cols-3 gap-2 mb-3">
-<button onclick="setQuickFilter('today',this)" class="quick-btn flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">Today</button>
-<button onclick="setQuickFilter('yesterday',this)" class="quick-btn flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">Yesterday</button>
-<button onclick="setQuickFilter('thisWeek',this)" class="quick-btn flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">This Week</button>
-<button onclick="setQuickFilter('thisMonth',this)" class="quick-btn flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">This Month</button>
-<button onclick="setQuickFilter('lastWeek',this)" class="quick-btn flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">Last Week</button>
-<button onclick="setQuickFilter('lastMonth',this)" class="quick-btn flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">Last Month</button>
+<button onclick="setQuickFilter('today',this)" class="quick-btn flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">Today</button>
+<button onclick="setQuickFilter('yesterday',this)" class="quick-btn flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">Yesterday</button>
+<button onclick="setQuickFilter('thisWeek',this)" class="quick-btn flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">This Week</button>
+<button onclick="setQuickFilter('thisMonth',this)" class="quick-btn flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">This Month</button>
+<button onclick="setQuickFilter('lastWeek',this)" class="quick-btn flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">Last Week</button>
+<button onclick="setQuickFilter('lastMonth',this)" class="quick-btn flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">Last Month</button>
 </div>
 <div class="grid grid-cols-2 gap-2 md:gap-3">
 <div><label class="text-[10px] uppercase font-bold text-slate-500 tracking-widest mb-1.5 block">TANGGAL MULAI</label><input type="date" id="startDate" value="2026-01-01" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] font-semibold"></div>
 <div><label class="text-[10px] uppercase font-bold text-slate-500 tracking-widest mb-1.5 block">TANGGAL AKHIR</label><input type="date" id="endDate" value="" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] font-semibold"></div>
 </div>
 <div class="grid grid-cols-3 gap-2 mt-3">
-<button onclick="loadDashboard()" class="flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-4 py-2.5 text-[13px] font-bold shadow-sm">Filter</button>
+<button onclick="loadDashboard()" class="flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-4 py-2.5 text-[13px] font-bold shadow-sm">Filter</button>
 <button onclick="resetFilter()" class="flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-4 py-2.5 text-[13px] font-bold shadow-sm">Reset</button>
-<button onclick="refreshData()" class="flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-4 py-2.5 text-[13px] font-bold shadow-sm">Refresh Data</button>
+<button onclick="refreshData()" class="flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-4 py-2.5 text-[13px] font-bold shadow-sm">Refresh Data</button>
 </div>
 </div>
 
@@ -80,28 +80,55 @@ async function loadDashboard(force){
   if(!sEl.value) sEl.value='2026-01-01';
   if(!eEl.value) eEl.value=fmtDateLocal(new Date());
   var s=sEl.value;var e=eEl.value;
+  console.log('LoadDashboard:', s, 'to', e, 'force:', !!force);
   var dot=document.getElementById('statusDot');var txt=document.getElementById('statusText');
   if(dot) dot.className='w-2 h-2 rounded-full bg-amber-400 animate-pulse';
   if(txt) txt.innerText='Loading...';
+  var eb=document.getElementById('errorBox');
   try{
-    var url=GOOGLE_SCRIPT_URL+'?start='+s+'&end='+e+(force?'&force=1':'')+'&_='+Date.now();
-    var res=await fetch(url,{cache:'no-cache'});
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    var data=await res.json();
+    var baseUrl=GOOGLE_SCRIPT_URL+'?startDate='+s+'&endDate='+e+'&start='+s+'&end='+e;
+    if(force) baseUrl+='&force=1';
+    baseUrl+='&_='+Date.now();
+    console.log('Fetching:', baseUrl);
+    var res=await fetch(baseUrl,{cache:'no-cache', redirect:'follow'});
+    console.log('Response status:', res.status, 'ok:', res.ok);
+    var text=await res.text();
+    console.log('Raw response (first 500):', text.substring(0,500));
+    var data;
+    try{ data=JSON.parse(text); }catch(parseErr){
+      console.error('JSON parse failed, raw:', text);
+      // If Google returns HTML error page (404), try to extract message
+      if(text.includes('404') || text.includes('Not Found')){
+        throw new Error('Google Script 404 - cek deploy: Publish > Deploy as web app > Who has access: Anyone. Raw: '+text.substring(0,200));
+      }
+      throw new Error('Response bukan JSON: '+text.substring(0,200));
+    }
     if(data.error) throw new Error(data.error);
-    currentData=data;renderDashboard(data);
+    currentData=data;
+    console.log('Data received:', data);
+    renderDashboard(data);
     if(dot) dot.className='w-2 h-2 rounded-full bg-emerald-500';
     if(txt) txt.innerText='Live';
-    document.getElementById('errorBox').classList.add('hidden');
+    if(eb) eb.classList.add('hidden');
   }catch(err){
+    console.error('loadDashboard failed:', err);
     if(dot) dot.className='w-2 h-2 rounded-full bg-red-500';
     if(txt) txt.innerText='Error';
-    var eb=document.getElementById('errorBox');eb.innerText='Gagal load: '+err.message;eb.classList.remove('hidden');console.error(err);
+    if(eb){ eb.innerText='Gagal load '+s+' to '+e+': '+err.message+' - Coba klik Refresh Data atau cek Google Script deployment (harus Anyone)'; eb.classList.remove('hidden'); }
+    // Jika filter Today/Yesterday gagal (404), tetap coba tampilkan pesan bahwa tidak ada data, bukan freeze
+    if(s===e){
+      // Kosongkan chart dengan data 0 biar user tau tidak ada data hari itu
+      try{
+        var emptyData={totalKg:0, days:1, totalChemMl:0, totalCost:0, machineRank:[], dailyTrend:[{date:e, kg:0}], machineChemList:[]};
+        renderDashboard(emptyData);
+        if(eb) eb.innerText+=' | Tidak ada data untuk tanggal '+e;
+      }catch(e2){}
+    }
   }
 }
 function renderDashboard(data){
   var mr=data.machineRank||[];
-  var total=data.totalKg;
+  var total=data.totalKg||data.totalWashKg;
   if(!total || total===0){
     var sumKg=0; for(var i=0;i<mr.length;i++){ sumKg+=(mr[i].kg||0); }
     if(sumKg>0) total=sumKg;
