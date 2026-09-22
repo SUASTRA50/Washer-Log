@@ -3,291 +3,173 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Washer Log</title>
+<title>Washer Log - FIXED</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700&display=swap" rel="stylesheet">
-<style>body{background:#f6f7fb;font-family:Inter,sans-serif}.card{background:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.04);border:1px solid #eef2f7}.kpi{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 50%,#2563eb 100%)}.scroll-x{overflow-x:auto}canvas{max-width:100%!important}
-.quick-active{ background:#0f172a !important; color:white !important; border-color:#0f172a !important; }
-</style>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="WasherLog">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<style>body{background:#f6f7fb;font-family:Inter,sans-serif}.card{background:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.04);border:1px solid #eef2f7}.kpi{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 50%,#2563eb 100%)}canvas{max-width:100%!important}.quick-active{outline:2px solid #0f172a;outline-offset:2px}</style>
 </head>
 <body>
-<script>
-var GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwblyWT04bVAF7VYxHBOdMiJLS4xROMsAvs3BUbzPPwxGkuDvxXk8nLKP_9V1ynbZc3/exec";
-</script>
+<script>var GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycbwblyWT04bVAF7VYxHBOdMiJLS4xROMsAvs3BUbzPPwxGkuDvxXk8nLKP_9V1ynbZc3/exec";</script>
+
 <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-6">
-  <div class="flex justify-between items-center mb-4">
-    <div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log</h1><p class="text-xs text-slate-500">Machines • Chemicals • Expenses</p></div>
-    <div class="flex items-center gap-2"><span id="statusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span id="statusText" class="text-xs text-slate-500">Loading</span></div>
-  </div>
-  <div id="errorBox" class="hidden card p-4 mb-4 bg-red-50 border-red-200 text-red-700 text-xs"></div>
-  <div class="card p-3 md:p-4 mb-5">
+<div class="flex justify-between items-center mb-4"><div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log</h1><p class="text-xs text-slate-500">Machines • Chemicals • Expenses</p></div><div class="flex items-center gap-2"><span id="statusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span id="statusText" class="text-xs text-slate-500">Loading</span></div></div>
+<div id="errorBox" class="hidden card p-4 mb-4 bg-red-50 border-red-200 text-red-700 text-xs"></div>
 
-    <!-- Quick Filter - BLUE responsive, sama besar persis dengan Filter/Reset/Refresh -->
-    <div class="grid grid-cols-3 gap-2 mb-3">
-      <button onclick="setQuickFilter('today', this)" data-f="today" class="quick-btn flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm transition">Today</button>
-      <button onclick="setQuickFilter('yesterday', this)" data-f="yesterday" class="quick-btn flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm transition">Yesterday</button>
-      <button onclick="setQuickFilter('thisWeek', this)" data-f="thisWeek" class="quick-btn flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm transition">This Week</button>
-      <button onclick="setQuickFilter('thisMonth', this)" data-f="thisMonth" class="quick-btn flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm transition">This Month</button>
-      <button onclick="setQuickFilter('lastWeek', this)" data-f="lastWeek" class="quick-btn flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm transition">Last Week</button>
-      <button onclick="setQuickFilter('lastMonth', this)" data-f="lastMonth" class="quick-btn flex items-center justify-center bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm transition">Last Month</button>
-    </div>
+<div class="card p-3 md:p-4 mb-5">
+<div class="grid grid-cols-3 gap-2 mb-3">
+<button onclick="setQuickFilter('today',this)" class="quick-btn flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">Today</button>
+<button onclick="setQuickFilter('yesterday',this)" class="quick-btn flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">Yesterday</button>
+<button onclick="setQuickFilter('thisWeek',this)" class="quick-btn flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">This Week</button>
+<button onclick="setQuickFilter('thisMonth',this)" class="quick-btn flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">This Month</button>
+<button onclick="setQuickFilter('lastWeek',this)" class="quick-btn flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">Last Week</button>
+<button onclick="setQuickFilter('lastMonth',this)" class="quick-btn flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-3 py-2.5 text-[12px] md:text-[13px] font-bold shadow-sm">Last Month</button>
+</div>
+<div class="grid grid-cols-2 gap-2 md:gap-3">
+<div><label class="text-[10px] uppercase font-bold text-slate-500 tracking-widest mb-1.5 block">TANGGAL MULAI</label><input type="date" id="startDate" value="2026-01-01" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] font-semibold"></div>
+<div><label class="text-[10px] uppercase font-bold text-slate-500 tracking-widest mb-1.5 block">TANGGAL AKHIR</label><input type="date" id="endDate" value="" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] font-semibold"></div>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-3">
+<button onclick="loadDashboard()" class="flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-4 py-2.5 text-[13px] font-bold shadow-sm">Filter</button>
+<button onclick="resetFilter()" class="flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-4 py-2.5 text-[13px] font-bold shadow-sm">Reset</button>
+<button onclick="refreshData()" class="flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-4 py-2.5 text-[13px] font-bold shadow-sm">Refresh Data</button>
+</div>
+</div>
 
-    <div class="grid grid-cols-2 gap-2 md:gap-3">
-      <div>
-        <label class="flex items-center gap-1 text-[10px] uppercase font-bold text-slate-500 tracking-widest mb-1.5"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>TANGGAL MULAI</label>
-        <input type="date" id="startDate" value="2026-01-01" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-      </div>
-      <div>
-        <label class="flex items-center gap-1 text-[10px] uppercase font-bold text-slate-500 tracking-widest mb-1.5"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>TANGGAL AKHIR</label>
-        <input type="date" id="endDate" value="" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-[13px] font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
-      </div>
-    </div>
-    <div class="grid grid-cols-3 gap-2 mt-3">
-      <button onclick="loadDashboard()" class="flex items-center justify-center gap-1.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-4 py-2.5 text-[13px] font-bold shadow-sm transition"><svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h7a1 1 0 100-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3z"/></svg>Filter</button>
-      <button onclick="resetFilter()" class="flex items-center justify-center gap-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-full px-4 py-2.5 text-[13px] font-bold shadow-sm transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Reset</button>
-      <button onclick="refreshData()" class="flex items-center justify-center gap-1.5 bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-full px-4 py-2.5 text-[13px] font-bold shadow-sm transition"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh Data</button>
-    </div>
-  </div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-5">
+<div class="lg:col-span-5"><div class="kpi rounded-[20px] p-6 text-white h-full flex flex-col justify-between min-h-[300px]"><div><p class="text-white/60 text-[10px] uppercase tracking-[0.2em] font-bold">Total Volume Cucian</p><h2 id="totalKg" class="text-5xl font-bold mt-3">-</h2><p class="text-white text-sm mt-2 bg-white/10 inline-block px-3 py-1 rounded-full">Avg harian: <span id="avgDailyText">-</span></p></div><div class="mt-6 grid grid-cols-3 gap-3"><div class="bg-white rounded-xl p-3 text-slate-900"><p class="text-[9px] uppercase font-bold">Avg/Hari</p><p id="avgKg" class="font-bold text-sm mt-1">-</p></div><div class="bg-white rounded-xl p-3 text-slate-900"><p class="text-[9px] uppercase font-bold">Chem</p><p id="totalChemMl" class="font-bold text-sm mt-1">-</p></div><div class="bg-white rounded-xl p-3 text-slate-900"><p class="text-[9px] uppercase font-bold">Biaya</p><p id="totalCost" class="font-bold text-sm mt-1">-</p></div></div></div></div>
+<div class="lg:col-span-7"><div class="card p-5 h-full"><div class="flex justify-between mb-3"><h3 class="text-sm font-bold">Trend Harian</h3><span id="avgBadge" class="text-[10px] bg-red-50 text-red-600 px-2 py-1 rounded-full">Avg: -</span></div><div class="h-[280px]"><canvas id="dailyChart"></canvas></div></div></div>
+</div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-5">
-    <div class="lg:col-span-5">
-      <div class="kpi rounded-[20px] p-6 text-white h-full flex flex-col justify-between min-h-[300px]">
-        <div>
-          <p class="text-white/60 text-[10px] uppercase tracking-[0.2em] font-bold">Total Volume Cucian</p>
-          <h2 id="totalKg" class="text-5xl font-bold mt-3 tracking-tight text-white drop-shadow-sm">-</h2>
-          <p class="text-white text-sm mt-2 font-medium bg-white/10 inline-block px-3 py-1 rounded-full">Avg harian: <span id="avgDailyText">-</span></p>
-        </div>
-        <div class="mt-6 grid grid-cols-3 gap-3">
-          <div class="bg-white rounded-xl p-3 text-slate-900"><p class="text-[9px] uppercase text-slate-500 font-bold tracking-widest">Avg/Hari</p><p id="avgKg" class="font-bold text-sm mt-1 text-slate-900">-</p></div>
-          <div class="bg-white rounded-xl p-3 text-slate-900"><p class="text-[9px] uppercase text-slate-500 font-bold tracking-widest">Chem</p><p id="totalChemMl" class="font-bold text-sm mt-1 text-slate-900">-</p></div>
-          <div class="bg-white rounded-xl p-3 text-slate-900"><p class="text-[9px] uppercase text-slate-500 font-bold tracking-widest">Biaya</p><p id="totalCost" class="font-bold text-sm mt-1 text-slate-900">-</p></div>
-        </div>
-      </div>
-    </div>
-    <div class="lg:col-span-7"><div class="card p-5 h-full"><div class="flex justify-between mb-3"><h3 class="text-sm font-bold">Trend Harian</h3><span id="avgBadge" class="text-[10px] bg-red-50 text-red-600 px-2 py-1 rounded-full font-semibold">Avg: -</span></div><div class="h-[280px]"><canvas id="dailyChart"></canvas></div></div></div>
-  </div>
+<div class="card p-4 md:p-5 mb-5"><h3 class="text-sm font-bold mb-3">Ranking Mesin - Kg & Total Biaya</h3><div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-[10px] text-slate-400 uppercase"><tr><th class="text-left px-4 py-2">Mesin</th><th class="text-right px-4 py-2">Kg</th><th class="text-right px-4 py-2">% Kg</th><th class="text-right px-4 py-2">Chem ml</th><th class="text-right px-4 py-2">Biaya</th></tr></thead><tbody id="machineTable"></tbody></table></div><div class="h-[120px] mt-3"><canvas id="machineChart"></canvas></div></div>
 
-  <div class="card p-4 md:p-5 mb-5">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
-      <h3 class="text-sm font-bold">Ranking Mesin • Kg & Total Biaya</h3>
-      <div class="flex items-center gap-2"><div class="h-[36px] md:h-auto"><canvas id="machineChart" class="w-[200px] md:w-[320px] h-[120px]"></canvas></div></div>
-    </div>
-    <div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-[10px] text-slate-400 uppercase tracking-widest"><tr><th class="text-left px-4 py-2">Mesin</th><th class="text-right px-4 py-2">Kg</th><th class="text-right px-4 py-2">% Kg</th><th class="text-right px-4 py-2">Chem ml</th><th class="text-right px-4 py-2">Biaya</th></tr></thead><tbody id="machineTable"></tbody></table></div>
-  </div>
+<div class="card p-4 md:p-5 mb-5"><div class="flex justify-between items-center mb-4"><h3 class="text-sm font-bold">Chemical Usage - ml & Rp</h3><select id="machineSelect" onchange="renderMachineChem()" class="text-xs border rounded-full px-3 py-1.5 bg-white"></select></div><div id="machineChemInsight" class="text-xs text-slate-600 bg-slate-50 rounded-xl p-3 mb-4"></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><p class="text-[10px] uppercase font-bold mb-2">ml per Chemical</p><div class="h-[240px]"><canvas id="machineChemMlChart"></canvas></div></div><div><p class="text-[10px] uppercase font-bold mb-2">Biaya per Chemical</p><div class="h-[240px]"><canvas id="machineChemRpChart"></canvas></div></div></div><div class="overflow-x-auto mt-4"><table class="w-full text-xs"><thead class="text-[10px] text-slate-400 uppercase"><tr><th class="text-left px-4 py-2">Chemical</th><th class="text-right px-4 py-2">ml</th><th class="text-right px-4 py-2">Biaya</th><th class="text-right px-4 py-2">%</th></tr></thead><tbody id="machineChemTable"></tbody></table></div></div>
 
-  <div class="card p-4 md:p-5 mb-5">
-    <div class="flex justify-between items-center mb-4"><h3 class="text-sm font-bold">Chemical Usage • ml & Rp</h3><select id="machineSelect" onchange="renderMachineChem()" class="text-xs border border-slate-200 rounded-full px-3 py-1.5 bg-white"></select></div>
-    <div id="machineChemInsight" class="text-xs text-slate-600 bg-slate-50 rounded-xl p-3 mb-4"></div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div><p class="text-[10px] uppercase font-bold text-slate-500 tracking-widest mb-2">ml per Chemical</p><div class="h-[240px]"><canvas id="machineChemMlChart"></canvas></div></div>
-      <div><p class="text-[10px] uppercase font-bold text-slate-500 tracking-widest mb-2">Biaya per Chemical</p><div class="h-[240px]"><canvas id="machineChemRpChart"></canvas></div></div>
-    </div>
-    <div class="overflow-x-auto mt-4"><table class="w-full text-xs"><thead class="text-[10px] text-slate-400 uppercase tracking-widest"><tr><th class="text-left px-4 py-2">Chemical</th><th class="text-right px-4 py-2">ml</th><th class="text-right px-4 py-2">Biaya</th><th class="text-right px-4 py-2">%</th></tr></thead><tbody id="machineChemTable"></tbody></table></div>
-  </div>
-
-  <div id="allMachines" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
 </div>
 
 <script>
-var currentData = null; var charts = {};
-function fmtKg(v){ return (v||0).toLocaleString('id-ID',{maximumFractionDigits:0}) + ' Kg'; }
-function fmtMl(v){ return (v||0).toLocaleString('id-ID',{maximumFractionDigits:0}) + ' ml'; }
-function fmtRp(v){ return 'Rp ' + (v||0).toLocaleString('id-ID',{maximumFractionDigits:0}); }
-function fmtDateLocal(d){
-  var yyyy = d.getFullYear();
-  var mm = String(d.getMonth()+1).padStart(2,'0');
-  var dd = String(d.getDate()).padStart(2,'0');
-  return yyyy+'-'+mm+'-'+dd;
-}
+var currentData=null;var charts={};
+function fmtKg(v){return (v||0).toLocaleString('id-ID',{maximumFractionDigits:0})+' Kg';}
+function fmtMl(v){return (v||0).toLocaleString('id-ID',{maximumFractionDigits:0})+' ml';}
+function fmtRp(v){return 'Rp '+(v||0).toLocaleString('id-ID',{maximumFractionDigits:0});}
+function fmtDateLocal(d){var y=d.getFullYear();var m=String(d.getMonth()+1).padStart(2,'0');var dd=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+dd;}
 
-function setQuickFilter(type, btn){
-  var now = new Date();
-  var start = new Date(now);
-  var end = new Date(now);
-  if(type==='today'){
-  } else if(type==='yesterday'){
-    start.setDate(now.getDate()-1);
-    end.setDate(now.getDate()-1);
-  } else if(type==='thisWeek'){
-    var day = now.getDay();
-    var diff = now.getDate() - day + (day===0 ? -6 : 1);
-    start = new Date(now);
-    start.setDate(diff);
-  } else if(type==='lastWeek'){
-    var day = now.getDay();
-    var diff = now.getDate() - day + (day===0 ? -6 : 1);
-    start = new Date(now);
-    start.setDate(diff-7);
-    end = new Date(start);
-    end.setDate(start.getDate()+6);
-  } else if(type==='thisMonth'){
-    start = new Date(now.getFullYear(), now.getMonth(), 1);
-  } else if(type==='lastMonth'){
-    start = new Date(now.getFullYear(), now.getMonth()-1, 1);
-    end = new Date(now.getFullYear(), now.getMonth(), 0);
-  }
-  document.getElementById('startDate').value = fmtDateLocal(start);
-  document.getElementById('endDate').value = fmtDateLocal(end);
-  document.querySelectorAll('.quick-btn').forEach(function(b){ b.classList.remove('quick-active'); });
+function setQuickFilter(type,btn){
+  var now=new Date();var start=new Date(now);var end=new Date(now);
+  if(type==='yesterday'){start.setDate(now.getDate()-1);end.setDate(now.getDate()-1);}
+  else if(type==='thisWeek'){var day=now.getDay();var diff=now.getDate()-day+(day===0?-6:1);start=new Date(now);start.setDate(diff);}
+  else if(type==='lastWeek'){var day=now.getDay();var diff=now.getDate()-day+(day===0?-6:1);start=new Date(now);start.setDate(diff-7);end=new Date(start);end.setDate(start.getDate()+6);}
+  else if(type==='thisMonth'){start=new Date(now.getFullYear(),now.getMonth(),1);}
+  else if(type==='lastMonth'){start=new Date(now.getFullYear(),now.getMonth()-1,1);end=new Date(now.getFullYear(),now.getMonth(),0);}
+  document.getElementById('startDate').value=fmtDateLocal(start);
+  document.getElementById('endDate').value=fmtDateLocal(end);
+  document.querySelectorAll('.quick-btn').forEach(function(b){b.classList.remove('quick-active');});
   if(btn) btn.classList.add('quick-active');
   loadDashboard();
 }
-
 function resetFilter(){
-  var first = new Date(2026,0,1);
-  var now = new Date();
-  document.getElementById('startDate').value = fmtDateLocal(first);
-  document.getElementById('endDate').value = fmtDateLocal(now);
-  document.querySelectorAll('.quick-btn').forEach(function(b){ b.classList.remove('quick-active'); });
+  var first=new Date(2026,0,1);var now=new Date();
+  document.getElementById('startDate').value=fmtDateLocal(first);
+  document.getElementById('endDate').value=fmtDateLocal(now);
+  document.querySelectorAll('.quick-btn').forEach(function(b){b.classList.remove('quick-active');});
   loadDashboard();
 }
-function refreshData(){ loadDashboard(true); }
-
+function refreshData(){loadDashboard(true);}
 async function loadDashboard(force){
-  var sEl = document.getElementById('startDate');
-  var eEl = document.getElementById('endDate');
-  // set default if empty: 1 Jan 2026 - today
-  if(!sEl.value){
-    sEl.value = fmtDateLocal(new Date(2026,0,1));
-  }
-  if(!eEl.value){
-    eEl.value = fmtDateLocal(new Date());
-  }
-  var s = sEl.value;
-  var e = eEl.value;
-  document.getElementById('statusDot').className='w-2 h-2 rounded-full bg-amber-400 animate-pulse';
-  document.getElementById('statusText').innerText='Loading...';
+  var sEl=document.getElementById('startDate');var eEl=document.getElementById('endDate');
+  if(!sEl.value) sEl.value='2026-01-01';
+  if(!eEl.value) eEl.value=fmtDateLocal(new Date());
+  var s=sEl.value;var e=eEl.value;
+  var dot=document.getElementById('statusDot');var txt=document.getElementById('statusText');
+  if(dot) dot.className='w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+  if(txt) txt.innerText='Loading...';
   try{
-    var url = GOOGLE_SCRIPT_URL + '?start=' + s + '&end=' + e + (force?'&force=1':'') + '&_=' + Date.now();
-    var res = await fetch(url, {cache:'no-cache'});
+    var url=GOOGLE_SCRIPT_URL+'?start='+s+'&end='+e+(force?'&force=1':'')+'&_='+Date.now();
+    var res=await fetch(url,{cache:'no-cache'});
     if(!res.ok) throw new Error('HTTP '+res.status);
-    var data = await res.json();
+    var data=await res.json();
     if(data.error) throw new Error(data.error);
-    currentData = data;
-    renderDashboard(data);
-    document.getElementById('statusDot').className='w-2 h-2 rounded-full bg-emerald-500';
-    document.getElementById('statusText').innerText='Live';
+    currentData=data;renderDashboard(data);
+    if(dot) dot.className='w-2 h-2 rounded-full bg-emerald-500';
+    if(txt) txt.innerText='Live';
     document.getElementById('errorBox').classList.add('hidden');
   }catch(err){
-    document.getElementById('statusDot').className='w-2 h-2 rounded-full bg-red-500';
-    document.getElementById('statusText').innerText='Error';
-    var eb = document.getElementById('errorBox');
-    eb.innerText = 'Gagal load data: ' + err.message + ' - cek deployment Google Script (Anyone) & koneksi internet';
-    eb.classList.remove('hidden');
-    console.error(err);
+    if(dot) dot.className='w-2 h-2 rounded-full bg-red-500';
+    if(txt) txt.innerText='Error';
+    var eb=document.getElementById('errorBox');eb.innerText='Gagal load: '+err.message;eb.classList.remove('hidden');console.error(err);
   }
 }
 function renderDashboard(data){
-  var total = data.totalKg||0; var days = data.days||1;
-  document.getElementById('totalKg').innerText = total.toLocaleString('id-ID');
-  var avgDaily = total / days;
-  document.getElementById('avgDailyText').innerText = avgDaily.toLocaleString('id-ID',{maximumFractionDigits:0}) + ' Kg';
-  document.getElementById('avgKg').innerText = Math.round(avgDaily).toLocaleString('id-ID') + ' Kg';
-  document.getElementById('totalChemMl').innerText = fmtMl(data.totalChemMl);
-  document.getElementById('totalCost').innerText = fmtRp(data.totalCost);
-  document.getElementById('avgBadge').innerText = 'Avg: ' + avgDaily.toLocaleString('id-ID',{maximumFractionDigits:2}) + ' Kg';
-  var mt = document.getElementById('machineTable'); var mHtml='';
-  var mr = data.machineRank||[];
-  for(var i=0;i<mr.length;i++){ var r=mr[i]; mHtml += '<tr class="border-t border-slate-100"><td class="px-4 py-2.5 font-medium">'+r.machine+'</td><td class="px-4 py-2.5 text-right">'+fmtKg(r.kg)+'</td><td class="px-4 py-2.5 text-right"><span class="bg-blue-50 text-blue-600 px-2 py-1 rounded-full text-[11px]">'+(total? (r.kg/total*100).toFixed(1):0)+'%</span></td><td class="px-4 py-2.5 text-right">'+fmtMl(r.ml)+'</td><td class="px-4 py-2.5 text-right font-semibold">'+fmtRp(r.cost)+'</td></tr>'; }
-  mt.innerHTML=mHtml;
-  var sel = document.getElementById('machineSelect'); var selHtml='';
-  for(var i=0;i<(data.machineChemList||[]).length;i++){ var m=data.machineChemList[i]; selHtml += '<option value="'+m.machine+'">'+m.machine+'</option>'; }
-  sel.innerHTML = selHtml; renderMachineChem();
-  drawCharts(data, avgDaily);
+  var mr=data.machineRank||[];
+  var total=data.totalKg;
+  if(!total || total===0){
+    var sumKg=0; for(var i=0;i<mr.length;i++){ sumKg+=(mr[i].kg||0); }
+    if(sumKg>0) total=sumKg;
+  }
+  if((!total || total===0) && data.dailyTrend){
+    var sumDaily=0; for(var i=0;i<data.dailyTrend.length;i++){ sumDaily+=(data.dailyTrend[i].kg||0); }
+    if(sumDaily>0) total=sumDaily;
+  }
+  if(!total) total=0;
+  var days=data.days||0;
+  if(!days || days===0){
+    if(data.dailyTrend && data.dailyTrend.length>0) days=data.dailyTrend.length;
+    else{
+      try{ var s=new Date(document.getElementById('startDate').value); var e=new Date(document.getElementById('endDate').value); var diff=Math.ceil((e-s)/(1000*60*60*24))+1; if(diff>0 && diff<1000) days=diff; else days=1; }catch(err){ days=1; }
+    }
+  }
+  if(days<=0) days=1;
+  var totalChem=data.totalChemMl||0;
+  if(!totalChem){ var sumChem=0; for(var i=0;i<mr.length;i++){ sumChem+=(mr[i].ml||0); } if(sumChem>0) totalChem=sumChem; }
+  var totalCostVal=data.totalCost||0;
+  if(!totalCostVal){ var sumCost=0; for(var i=0;i<mr.length;i++){ sumCost+=(mr[i].cost||0); } if(sumCost>0) totalCostVal=sumCost; }
+
+  document.getElementById('totalKg').innerText=total.toLocaleString('id-ID');
+  var avg=total/days;
+  document.getElementById('avgDailyText').innerText=avg.toLocaleString('id-ID',{maximumFractionDigits:0})+' Kg';
+  document.getElementById('avgKg').innerText=Math.round(avg).toLocaleString('id-ID')+' Kg';
+  document.getElementById('totalChemMl').innerText=fmtMl(totalChem);
+  document.getElementById('totalCost').innerText=fmtRp(totalCostVal);
+  document.getElementById('avgBadge').innerText='Avg: '+avg.toLocaleString('id-ID',{maximumFractionDigits:2})+' Kg';
+  var mt=document.getElementById('machineTable'); var h=''; 
+  for(var i=0;i<mr.length;i++){ var r=mr[i]; var pct=total?(r.kg/total*100).toFixed(1):0; h+='<tr class="border-t border-slate-100"><td class="px-4 py-2.5 font-medium">'+r.machine+'</td><td class="px-4 py-2.5 text-right">'+fmtKg(r.kg)+'</td><td class="px-4 py-2.5 text-right"><span class="bg-blue-50 text-blue-600 px-2 py-1 rounded-full text-[11px]">'+pct+'%</span></td><td class="px-4 py-2.5 text-right">'+fmtMl(r.ml)+'</td><td class="px-4 py-2.5 text-right font-semibold">'+fmtRp(r.cost)+'</td></tr>'; }
+  mt.innerHTML=h;
+  var sel=document.getElementById('machineSelect'); var sh='';
+  for(var i=0;i<(data.machineChemList||[]).length;i++){ var m=data.machineChemList[i]; sh+='<option value="'+m.machine+'">'+m.machine+'</option>'; }
+  sel.innerHTML=sh; renderMachineChem(); drawCharts(data,avg);
 }
+
 function renderMachineChem(){
-  if(!currentData || !currentData.machineChemList) return;
-  var sel = document.getElementById('machineSelect');
-  var machineName = sel.value || currentData.machineChemList[0].machine;
-  var machineData = null; for(var i=0;i<currentData.machineChemList.length;i++){ if(currentData.machineChemList[i].machine===machineName){ machineData=currentData.machineChemList[i]; break; } }
-  if(!machineData) return;
-  var tableHtml = ''; for(var i=0;i<machineData.chemicals.length;i++){ var c = machineData.chemicals[i]; var pct = machineData.totalCost ? (c.cost/machineData.totalCost*100).toFixed(1) : 0; tableHtml += '<tr><td class="px-4 py-2.5 font-medium">' + c.name + '</td><td class="px-4 py-2.5 text-right">' + fmtMl(c.ml) + '</td><td class="px-4 py-2.5 text-right font-semibold">' + fmtRp(c.cost) + '</td><td class="px-4 py-2.5 text-right"><span class="bg-slate-100 px-2 py-1 rounded-full text-[11px]">' + pct + '%</span></td></tr>'; }
-  document.getElementById('machineChemTable').innerHTML = tableHtml;
-  document.getElementById('machineChemInsight').innerHTML = 'Mesin <b>' + machineName + '</b> total <b>' + fmtMl(machineData.totalMl) + '</b> = <b>' + fmtRp(machineData.totalCost) + '</b><br>Terboros: <b>' + (machineData.chemicals[0]?machineData.chemicals[0].name:'-') + '</b>';
-  if(charts.mMl && charts.mMl.destroy) charts.mMl.destroy(); if(charts.mRp && charts.mRp.destroy) charts.mRp.destroy();
-  var top5 = machineData.chemicals.slice(0,5); var labelsMl = []; var dataMl = []; var labelsRp = []; var dataRp = []; for(var i=0;i<top5.length;i++){ labelsMl.push(top5[i].name.replace('ES ','').slice(0,15)); dataMl.push(top5[i].ml); labelsRp.push(top5[i].name.slice(0,15)); dataRp.push(top5[i].cost); }
-  charts.mMl = new Chart(document.getElementById('machineChemMlChart'), { type: 'bar', data: { labels: labelsMl, datasets: [{ data: dataMl, backgroundColor: '#0ea5e9', borderRadius: 6 }] }, options: { responsive:true, maintainAspectRatio:false, indexAxis:'y', plugins:{ legend:{ display:false } } } });
-  charts.mRp = new Chart(document.getElementById('machineChemRpChart'), { type: 'doughnut', data: { labels: labelsRp, datasets: [{ data: dataRp, backgroundColor: ['#2563eb','#10b981','#f59e0b','#ef4444','#6366f1'], borderWidth:0 }] }, options: { responsive:true, maintainAspectRatio:false, cutout:'60%', plugins:{ legend:{ position:'bottom', labels:{ boxWidth:8, font:{size:8} } } } } });
+  if(!currentData||!currentData.machineChemList) return;
+  var sel=document.getElementById('machineSelect');var name=sel.value||currentData.machineChemList[0].machine;var md=null;
+  for(var i=0;i<currentData.machineChemList.length;i++){if(currentData.machineChemList[i].machine===name){md=currentData.machineChemList[i];break;}}
+  if(!md) return;
+  var th='';for(var i=0;i<md.chemicals.length;i++){var c=md.chemicals[i];var pct=md.totalCost?(c.cost/md.totalCost*100).toFixed(1):0;th+='<tr><td class="px-4 py-2.5 font-medium">'+c.name+'</td><td class="px-4 py-2.5 text-right">'+fmtMl(c.ml)+'</td><td class="px-4 py-2.5 text-right font-semibold">'+fmtRp(c.cost)+'</td><td class="px-4 py-2.5 text-right"><span class="bg-slate-100 px-2 py-1 rounded-full text-[11px]">'+pct+'%</span></td></tr>';}
+  document.getElementById('machineChemTable').innerHTML=th;
+  document.getElementById('machineChemInsight').innerHTML='Mesin <b>'+name+'</b> total <b>'+fmtMl(md.totalMl)+'</b> = <b>'+fmtRp(md.totalCost)+'</b><br>Terboros: <b>'+(md.chemicals[0]?md.chemicals[0].name:'-')+'</b>';
+  if(charts.mMl&&charts.mMl.destroy) charts.mMl.destroy();if(charts.mRp&&charts.mRp.destroy) charts.mRp.destroy();
+  var top5=md.chemicals.slice(0,5);var lMl=[],dMl=[],lRp=[],dRp=[];
+  for(var i=0;i<top5.length;i++){lMl.push(top5[i].name.replace('ES ','').slice(0,15));dMl.push(top5[i].ml);lRp.push(top5[i].name.slice(0,15));dRp.push(top5[i].cost);}
+  charts.mMl=new Chart(document.getElementById('machineChemMlChart'),{type:'bar',data:{labels:lMl,datasets:[{data:dMl,backgroundColor:'#0ea5e9',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}}}});
+  charts.mRp=new Chart(document.getElementById('machineChemRpChart'),{type:'doughnut',data:{labels:lRp,datasets:[{data:dRp,backgroundColor:['#2563eb','#10b981','#f59e0b','#ef4444','#6366f1'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{boxWidth:8,font:{size:8}}}}}});
 }
-function renderAllMachineCards(){ return; }
-function drawCharts(data, avgDaily){
-  if(charts.daily && charts.daily.destroy) charts.daily.destroy();
-  if(charts.machine && charts.machine.destroy) charts.machine.destroy();
-  var isMobile = window.innerWidth < 768;
-  var dailyLabels = []; var dailyVals = [];
-  if(data.dailyTrend){ for(var i=0;i<data.dailyTrend.length;i++){ dailyLabels.push(data.dailyTrend[i].date.slice(5)); dailyVals.push(data.dailyTrend[i].kg||0); } }
-  var avgVals = []; for(var i=0;i<dailyLabels.length;i++){ avgVals.push(avgDaily); }
-  charts.daily = new Chart(document.getElementById('dailyChart'), {
-    type: 'line',
-    data: { labels: dailyLabels, datasets: [ { label: 'Kg / Hari', data: dailyVals, borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.12)', fill:true, tension:0.4, borderWidth:2.5, pointRadius:0 }, { label: 'Average', data: avgVals, borderColor: '#ef4444', borderDash:[6,4], borderWidth:2, pointRadius:0, fill:false } ] },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:true, position:'bottom', labels:{ boxWidth:10, font:{size:10} } } }, scales:{ x:{ grid:{ display:false }, ticks:{ maxTicksLimit: isMobile?6:12 } }, y:{ grid:{ color:'#f1f5f9' } } }
-  });
-  var mLabels = []; var mVals = []; var mr = data.machineRank || []; for(var i=0;i<mr.length;i++){ mLabels.push(mr[i].machine); mVals.push(mr[i].kg); }
-  charts.machine = new Chart(document.getElementById('machineChart'), { type: 'bar', data: { labels: mLabels, datasets: [{ data: mVals, backgroundColor: '#2563eb', borderRadius:6 }] }, options: { responsive:true, maintainAspectRatio:false, indexAxis:'y', plugins:{ legend:{ display:false } } } });
+function drawCharts(data,avgDaily){
+  if(charts.daily&&charts.daily.destroy) charts.daily.destroy();
+  if(charts.machine&&charts.machine.destroy) charts.machine.destroy();
+  var isMobile=window.innerWidth<768;
+  var dailyLabels=[];var dailyVals=[];
+  if(data.dailyTrend){for(var i=0;i<data.dailyTrend.length;i++){dailyLabels.push(data.dailyTrend[i].date.slice(5));dailyVals.push(data.dailyTrend[i].kg||0);}}
+  var avgVals=[];for(var i=0;i<dailyLabels.length;i++){avgVals.push(avgDaily);}
+  charts.daily=new Chart(document.getElementById('dailyChart'),{type:'line',data:{labels:dailyLabels,datasets:[{label:'Kg / Hari',data:dailyVals,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.12)',fill:true,tension:0.4,borderWidth:2.5,pointRadius:0},{label:'Average',data:avgVals,borderColor:'#ef4444',borderDash:[6,4],borderWidth:2,pointRadius:0,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:10,font:{size:10}}}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:isMobile?6:12}},y:{grid:{color:'#f1f5f9'}}}}});
+  var mLabels=[];var mVals=[];var mr=data.machineRank||[];for(var i=0;i<mr.length;i++){mLabels.push(mr[i].machine);mVals.push(mr[i].kg);}
+  charts.machine=new Chart(document.getElementById('machineChart'),{type:'bar',data:{labels:mLabels,datasets:[{data:mVals,backgroundColor:'#2563eb',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}}}});
 }
-window.addEventListener('DOMContentLoaded', function(){
-  // default: 1 Jan 2026 - Today
-  var startEl = document.getElementById('startDate');
-  var endEl = document.getElementById('endDate');
-  if(!startEl.value) startEl.value = '2026-01-01';
-  if(!endEl.value) endEl.value = fmtDateLocal(new Date());
+window.addEventListener('DOMContentLoaded',function(){
+  var sEl=document.getElementById('startDate');var eEl=document.getElementById('endDate');
+  if(!sEl.value) sEl.value='2026-01-01';
+  if(!eEl.value) eEl.value=fmtDateLocal(new Date());
   loadDashboard();
 });
 </script>
-
-<div id="installBanner" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-[360px] bg-slate-900 text-white rounded-2xl p-4 shadow-2xl z-50 flex items-center justify-between gap-3">
-  <div class="flex items-center gap-3">
-    <img src="icon-192.png" class="w-10 h-10 rounded-xl">
-    <div><p class="text-sm font-bold">Install Washer Log</p><p class="text-[11px] text-white/60">Jadi aplikasi di HP / Laptop</p></div>
-  </div>
-  <div class="flex gap-2">
-    <button onclick="dismissInstall()" class="text-white/60 text-xs px-2">Nanti</button>
-    <button id="installBtn" class="bg-white text-slate-900 px-4 py-2 rounded-full text-xs font-bold">Install</button>
-  </div>
-</div>
-
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('./sw.js').then(function(reg){ console.log('SW registered', reg.scope); }).catch(function(err){ console.log('SW fail', err); });
-  });
-}
-let deferredPrompt = null;
-const installBanner = document.getElementById('installBanner');
-const installBtn = document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBanner.classList.remove('hidden'); });
-installBtn.addEventListener('click', async () => {
-  if(!deferredPrompt) return;
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  installBanner.classList.add('hidden');
-});
-function dismissInstall(){ installBanner.classList.add('hidden'); }
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-if(isIOS && !isStandalone){
-  setTimeout(()=>{ 
-    if(!localStorage.getItem('pwa-ios-hint-dismissed')){
-      const b = document.getElementById('installBanner');
-      b.querySelector('p.font-bold').innerText='Add to Home Screen';
-      b.querySelector('p.text-\[11px\]').innerText='Tap Share > Add to Home Screen di Safari';
-      document.getElementById('installBtn').innerText='OK';
-      document.getElementById('installBtn').onclick=()=>{b.classList.add('hidden'); localStorage.setItem('pwa-ios-hint-dismissed','1');};
-      b.classList.remove('hidden');
-    }
-  }, 3000);
-}
-</script>
-
 </body>
 </html>
