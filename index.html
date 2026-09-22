@@ -116,7 +116,7 @@ async function loadDashboard(force){
     console.error('loadDashboard failed:', err);
     if(dot) dot.className='w-2 h-2 rounded-full bg-red-500';
     if(txt) txt.innerText='Error';
-    if(eb){ eb.innerText='Jaringan terputus coba beberapa saat lagi'; eb.classList.remove('hidden'); }
+    if(eb){ eb.innerText='Jaringan terputus coba beberapa saat lagi'; }
     // Jika filter Today/Yesterday gagal (404), tetap coba tampilkan pesan bahwa tidak ada data, bukan freeze
     if(s===e){
       // Kosongkan chart dengan data 0 biar user tau tidak ada data hari itu
