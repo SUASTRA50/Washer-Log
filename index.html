@@ -41,9 +41,11 @@
 <div class="lg:col-span-7"><div class="card p-5 h-full"><div class="flex justify-between mb-3"><h3 class="text-sm font-bold">Trend Harian</h3><span id="avgBadge" class="text-[10px] bg-red-50 text-red-600 px-2 py-1 rounded-full">Avg: -</span></div><div class="h-[280px]"><canvas id="dailyChart"></canvas></div></div></div>
 </div>
 
-<div class="card p-4 md:p-5 mb-5"><h3 class="text-sm font-bold mb-3">Ranking Mesin - Kg & Total Biaya</h3><div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-[10px] text-slate-400 uppercase"><tr><th class="text-left px-4 py-2">Mesin</th><th class="text-right px-4 py-2">Kg</th><th class="text-right px-4 py-2">% Kg</th><th class="text-right px-4 py-2">Chem ml</th><th class="text-right px-4 py-2">Biaya</th></tr></thead><tbody id="machineTable"></tbody></table></div><div class="h-[120px] mt-3"><canvas id="machineChart"></canvas></div></div>
+<div class="card p-4 md:p-5 mb-5"><h3 class="text-sm font-bold mb-3">Washer + Frekuensi Pencucian</h3><div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-[10px] text-slate-500 uppercase tracking-widest"><tr><th class="text-left px-4 py-3 w-[60px]">NO</th><th class="text-left px-4 py-3">NAMA</th><th class="text-right px-4 py-3">TOTAL KG</th><th class="text-right px-4 py-3">FREKUENSI</th><th class="text-right px-4 py-3 w-[80px]">%</th></tr></thead><tbody id="machineTable"></tbody></table></div><div class="h-[120px] mt-3"><canvas id="machineChart"></canvas></div></div>
 
-<div class="card p-4 md:p-5 mb-5"><div class="flex justify-between items-center mb-4"><h3 class="text-sm font-bold">Chemical Usage - ml & Rp</h3><select id="machineSelect" onchange="renderMachineChem()" class="text-xs border rounded-full px-3 py-1.5 bg-white"></select></div><div id="machineChemInsight" class="text-xs text-slate-600 bg-slate-50 rounded-xl p-3 mb-4"></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><p class="text-[10px] uppercase font-bold mb-2">ml per Chemical</p><div class="h-[240px]"><canvas id="machineChemMlChart"></canvas></div></div><div><p class="text-[10px] uppercase font-bold mb-2">Biaya per Chemical</p><div class="h-[240px]"><canvas id="machineChemRpChart"></canvas></div></div></div><div class="overflow-x-auto mt-4"><table class="w-full text-xs"><thead class="text-[10px] text-slate-400 uppercase"><tr><th class="text-left px-4 py-2">Chemical</th><th class="text-right px-4 py-2">ml</th><th class="text-right px-4 py-2">Biaya</th><th class="text-right px-4 py-2">%</th></tr></thead><tbody id="machineChemTable"></tbody></table></div></div>
+
+<div class="card p-4 md:p-5 mb-5"><div class="flex justify-between items-center mb-3"><h3 class="text-sm font-bold">Program Pencucian</h3><span class="text-[10px] text-slate-400 uppercase tracking-widest">Frekuensi Penggunaan</span></div><div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-[10px] text-slate-500 uppercase tracking-widest"><tr><th class="text-left px-4 py-2 w-[50px]">RANK</th><th class="text-left px-4 py-2">NAMA PROGRAM</th><th class="text-right px-4 py-2">FREKUENSI</th></tr></thead><tbody id="programTable"></tbody></table></div></div>
+<div class="card p-4 md:p-5 mb-5"><div class="flex justify-between items-center mb-4"><h3 class="text-sm font-bold">Chemical Usage - ml & Rp</h3><select id="machineSelect" onchange="renderMachineChem()" class="text-xs border rounded-full px-3 py-1.5 bg-white"></select></div><div id="machineChemInsight" class="text-xs text-slate-600 bg-slate-50 rounded-xl p-3 mb-4"></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><p class="text-[10px] uppercase font-bold mb-2">ml per Chemical</p><div class="h-[240px]"><canvas id="machineChemMlChart"></canvas></div></div><div><p class="text-[10px] uppercase font-bold mb-2">Biaya per Chemical</p><div class="h-[240px]"><canvas id="machineChemRpChart"></canvas></div></div></div><div class="overflow-x-auto mt-4"><table class="w-full text-xs"><thead class="text-[10px] text-slate-400 uppercase tracking-widest"><tr><th class="text-left px-4 py-2">Chemical</th><th class="text-right px-4 py-2">ml</th><th class="text-right px-4 py-2">Biaya</th><th class="text-right px-4 py-2">%</th></tr></thead><tbody id="machineChemTable"></tbody></table></div></div>
 
 </div>
 
@@ -114,7 +116,7 @@ async function loadDashboard(force){
     console.error('loadDashboard failed:', err);
     if(dot) dot.className='w-2 h-2 rounded-full bg-red-500';
     if(txt) txt.innerText='Error';
-    if(eb){ eb.innerText='Gagal load '+s+' to '+e+': '+err.message+' - Coba klik Refresh Data atau cek Google Script deployment (harus Anyone)'; eb.classList.remove('hidden'); }
+    if(eb){ eb.innerText='Jaringan terputus coba beberapa saat lagi'; eb.classList.remove('hidden'); }
     // Jika filter Today/Yesterday gagal (404), tetap coba tampilkan pesan bahwa tidak ada data, bukan freeze
     if(s===e){
       // Kosongkan chart dengan data 0 biar user tau tidak ada data hari itu
@@ -158,9 +160,43 @@ function renderDashboard(data){
   document.getElementById('totalChemMl').innerText=fmtMl(totalChem);
   document.getElementById('totalCost').innerText=fmtRp(totalCostVal);
   document.getElementById('avgBadge').innerText='Avg: '+avg.toLocaleString('id-ID',{maximumFractionDigits:2})+' Kg';
-  var mt=document.getElementById('machineTable'); var h=''; 
-  for(var i=0;i<mr.length;i++){ var r=mr[i]; var pct=total?(r.kg/total*100).toFixed(1):0; h+='<tr class="border-t border-slate-100"><td class="px-4 py-2.5 font-medium">'+r.machine+'</td><td class="px-4 py-2.5 text-right">'+fmtKg(r.kg)+'</td><td class="px-4 py-2.5 text-right"><span class="bg-blue-50 text-blue-600 px-2 py-1 rounded-full text-[11px]">'+pct+'%</span></td><td class="px-4 py-2.5 text-right">'+fmtMl(r.ml)+'</td><td class="px-4 py-2.5 text-right font-semibold">'+fmtRp(r.cost)+'</td></tr>'; }
+        var mt=document.getElementById('machineTable'); var h='';
+  // Prioritas: topStaff (nama staff) seperti di screenshot 48.599 / Mohammad Akromudin dll, fallback ke machineRank
+  var rankingData = [];
+  var isStaffRanking = false;
+  if(data.topStaff && data.topStaff.length>0){
+    rankingData = data.topStaff;
+    isStaffRanking = true;
+  } else {
+    rankingData = mr;
+    isStaffRanking = false;
+  }
+  var maxKg = 0;
+  for(var j=0;j<rankingData.length;j++){ var k = isStaffRanking ? (rankingData[j].kg||0) : (rankingData[j].kg||rankingData[j].totalKg||0); if(k>maxKg) maxKg=k; }
+  if(maxKg===0) maxKg=1;
+  for(var i=0;i<rankingData.length;i++){
+    var r=rankingData[i];
+    var no=i+1;
+    var nama = isStaffRanking ? (r.name||'') : (r.washer||r.machine||r.name||'');
+    var kgVal = r.kg||r.totalKg||0;
+    var freq = r.count||r.frekuensi||r.frequency||0;
+    var pct = total ? (kgVal/total*100).toFixed(1) : 0;
+    var barPct = (kgVal/maxKg*100).toFixed(1);
+    // Bar style seperti screenshot: hitam di atas abu
+    h+='<tr class="border-t border-slate-100 hover:bg-slate-50/60 transition"><td class="px-4 py-3.5 text-slate-500 font-medium text-[12px]">'+no+'</td><td class="px-4 py-3.5"><div class="font-semibold text-slate-800 text-[13px]">'+nama+'</div><div class="w-full bg-slate-100 h-[6px] rounded-full mt-2 overflow-hidden"><div class="bg-slate-900 h-[6px] rounded-full" style="width:'+barPct+'%"></div></div></td><td class="px-4 py-3.5 text-right font-bold text-[13px]">'+fmtKg(kgVal)+'</td><td class="px-4 py-3.5 text-right"><span class="bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-full text-[11px] font-bold">'+freq.toLocaleString('id-ID')+'x</span></td><td class="px-4 py-3.5 text-right"><span class="text-slate-600 font-medium text-[12px]">'+pct+'%</span></td></tr>';
+  }
   mt.innerHTML=h;
+  // Program Pencucian table
+  var pt=document.getElementById('programTable');
+  if(pt){
+    var ph='';
+    var progData = data.programRank||[];
+    for(var i=0;i<Math.min(progData.length,10);i++){
+      var pr=progData[i];
+      ph+='<tr class="border-t border-slate-100"><td class="px-4 py-3 font-bold text-slate-500">#'+(i+1)+'</td><td class="px-4 py-3"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span><span class="font-medium">'+(pr.program||pr.name||'')+'</span></div></td><td class="px-4 py-3 text-right font-bold">'+(pr.count||0).toLocaleString('id-ID')+' Kali</td></tr>';
+    }
+    pt.innerHTML=ph;
+  }
   var sel=document.getElementById('machineSelect'); var sh='';
   for(var i=0;i<(data.machineChemList||[]).length;i++){ var m=data.machineChemList[i]; sh+='<option value="'+m.machine+'">'+m.machine+'</option>'; }
   sel.innerHTML=sh; renderMachineChem(); drawCharts(data,avg);
