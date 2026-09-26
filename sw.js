@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'washer-log-v64-1';
+const CACHE_NAME = 'washer-log-v64-2';
 const ASSETS = [
   './',
   './index.html',
