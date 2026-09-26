@@ -1,11 +1,13 @@
 {
+  "id": "/Washer-Log/",
   "name": "Washer Log",
-  "short_name": "WasherLog",
-  "start_url": "./",
-  "scope": "./",
+  "short_name": "Washer Log",
+  "description": "Catatan cuci mesin industri",
+  "start_url": "/Washer-Log/",
+  "scope": "/Washer-Log/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2563eb",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
   "icons": [
     {
       "src": "./icon-192.png",
