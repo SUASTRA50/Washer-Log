@@ -1,4 +1,4 @@
-const CACHE_NAME = 'washer-log-v70';
+const CACHE_NAME = 'washer-log-v72-isolated';
 const ASSETS = [
   './',
   './index.html',
@@ -10,36 +10,37 @@ const ASSETS = [
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
-    .then(()=>self.skipWaiting())
   );
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k))))
-    .then(()=>self.clients.claim())
+    caches.keys().then(keys => Promise.all(
+      keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+    ))
   );
+  self.clients.claim();
 });
 
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
-  if(url.hostname.includes('script.google.com') || url.hostname.includes('googleusercontent.com')){
-    return; // jangan cache API
-  }
-  // Untuk CDN, pakai network first, jangan cache di install
-  if(url.hostname.includes('cdn.tailwindcss.com') || url.hostname.includes('cdn.jsdelivr.net')){
-    e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));
+  // Jangan sentuh CDN / google script sama sekali - biar gak tracking prevention
+  if(url.hostname.includes('cdn.') || url.hostname.includes('jsdelivr') || url.hostname.includes('google') || url.hostname.includes('tailwindcss')){
     return;
   }
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      return cached || fetch(e.request).then(resp => {
-        if(e.request.method==='GET' && resp.status===200 && resp.type==='basic'){
-          const clone = resp.clone();
-          caches.open(CACHE_NAME).then(cache=>cache.put(e.request, clone));
-        }
-        return resp;
-      }).catch(()=>cached);
-    })
-  );
+  // Hanya handle request di scope Washer-Log
+  if(url.pathname.startsWith('/Washer-Log/') || url.origin === location.origin){
+    e.respondWith(
+      caches.match(e.request).then(cached => {
+        return cached || fetch(e.request).then(res => {
+          if(res.ok && e.request.method === 'GET' && e.request.url.startsWith('http')){
+             const clone = res.clone();
+             caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+          }
+          return res;
+        });
+      })
+    );
+  }
 });
