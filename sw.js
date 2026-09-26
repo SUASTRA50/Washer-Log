@@ -1,11 +1,6 @@
 
 const CACHE_NAME = 'washer-log-v64-2';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './icon-192.png',
-  './icon-512.png',
+
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'
 ];
