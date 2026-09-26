@@ -52,8 +52,6 @@
         <option value="2026" selected>2026</option>
         <option value="2027">2027</option>
         <option value="2028">2028</option>
-        <option value="2029">2029</option>
-        <option value="2030">2030</option>
       </select>
     </div>
   </div>
@@ -450,6 +448,14 @@ window.addEventListener('DOMContentLoaded',function(){
   // init yearly after slight delay
   setTimeout(function(){ var ys=document.getElementById('yearSelect'); if(ys) ys.value='2026'; loadYearlyTrend(); }, 800);
 });
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').then(r=>console.log('SW registered', r.scope)).catch(e=>console.log('SW fail', e));
+  });
+}
 </script>
 </body>
 </html>
