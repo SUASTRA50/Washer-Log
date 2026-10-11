@@ -87,6 +87,40 @@
   </div>
 </div>
 
+<!-- NEW: Kategori Chemical Ecolab & Seitz - Urutan: Ecolab dulu, Seitz setelahnya -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5">
+  <div class="card p-4 md:p-5">
+    <div class="flex justify-between items-center mb-3">
+      <h3 class="text-sm font-bold">Total Konsumsi Chemical Ecolab</h3>
+      <span id="ecolabBadge" class="text-[10px] bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-bold">-</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs">
+        <thead class="bg-slate-900 text-white text-[10px] uppercase tracking-widest">
+          <tr><th class="text-left px-4 py-2.5 rounded-l-lg">NO</th><th class="text-left px-4 py-2.5">CHEMICAL</th><th class="text-right px-4 py-2.5">VOLUME/ML</th><th class="text-right px-4 py-2.5 rounded-r-lg">BIAYA/RP</th></tr>
+        </thead>
+        <tbody id="chemEcolabTable"></tbody>
+        <tfoot id="chemEcolabFoot" class="bg-slate-50 font-bold border-t-2 border-slate-900 text-[12px]"></tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="card p-4 md:p-5">
+    <div class="flex justify-between items-center mb-3">
+      <h3 class="text-sm font-bold">Total Konsumsi Chemical Seitz</h3>
+      <span id="seitzBadge" class="text-[10px] bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-bold">-</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs">
+        <thead class="bg-slate-900 text-white text-[10px] uppercase tracking-widest">
+          <tr><th class="text-left px-4 py-2.5 rounded-l-lg">NO</th><th class="text-left px-4 py-2.5">CHEMICAL</th><th class="text-right px-4 py-2.5">VOLUME/ML</th><th class="text-right px-4 py-2.5 rounded-r-lg">BIAYA/RP</th></tr>
+        </thead>
+        <tbody id="chemSeitzTable"></tbody>
+        <tfoot id="chemSeitzFoot" class="bg-slate-50 font-bold border-t-2 border-slate-900 text-[12px]"></tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
 <div class="card p-4 md:p-5 mb-5"><div class="flex justify-between items-center mb-3"><h3 class="text-sm font-bold">Program Pencucian</h3><span class="text-[10px] text-slate-400 uppercase tracking-widest">Frekuensi Penggunaan</span></div><div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-[10px] text-slate-500 uppercase tracking-widest"><tr><th class="text-left px-4 py-2 w-[50px]">RANK</th><th class="text-left px-4 py-2">NAMA PROGRAM</th><th class="text-right px-4 py-2">FREKUENSI</th></tr></thead><tbody id="programTable"></tbody></table></div></div>
 
 <div class="card p-4 md:p-5 mb-5"><div class="flex justify-between items-center mb-4"><h3 class="text-sm font-bold">Konsumsi Chemical per Mesin</h3><select id="machineSelect" onchange="renderMachineChem()" class="text-xs border rounded-full px-3 py-1.5 bg-white"></select></div><div id="machineChemInsight" class="text-xs text-slate-600 bg-slate-50 rounded-xl p-3 mb-4"></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><p class="text-[10px] uppercase font-bold mb-2">ML per Chemical</p><div class="h-[240px]"><canvas id="machineChemMlChart"></canvas></div></div><div><p class="text-[10px] uppercase font-bold mb-2">Biaya per Chemical</p><div class="h-[240px]"><canvas id="machineChemRpChart"></canvas></div></div></div><div class="overflow-x-auto mt-4"><table class="w-full text-xs"><thead class="text-[10px] text-slate-400 uppercase tracking-widest"><tr><th class="text-left px-4 py-2">Chemical</th><th class="text-right px-4 py-2">ml</th><th class="text-right px-4 py-2">Biaya</th><th class="text-right px-4 py-2">%</th></tr></thead><tbody id="machineChemTable"></tbody></table></div></div>
@@ -218,16 +252,65 @@ function renderDashboard(data){
     ml.innerHTML=lh;
   }
 
-  // Total Konsumsi Chemical
+  // Total Konsumsi Chemical + Kategori Ecolab & Seitz
   var ct=document.getElementById('chemTotalTable');
+  var ecolabTable=document.getElementById('chemEcolabTable');
+  var seitzTable=document.getElementById('chemSeitzTable');
+  var ecolabFoot=document.getElementById('chemEcolabFoot');
+  var seitzFoot=document.getElementById('chemSeitzFoot');
+  var ecolabBadge=document.getElementById('ecolabBadge');
+  var seitzBadge=document.getElementById('seitzBadge');
   if(ct){
     var ch='';
     var chemData=data.chemRank||[];
+    var ecolabData=[];
+    var seitzData=[];
     for(var i=0;i<chemData.length;i++){
       var c=chemData[i];
+      var nm=(c.name||'').trim();
+      // Viva* => Seitz, lainnya Ecolab
+      if(nm.toLowerCase().indexOf('viva')===0){
+        seitzData.push(c);
+      } else {
+        ecolabData.push(c);
+      }
       ch+='<tr class="border-t border-slate-100"><td class="px-4 py-2.5 text-slate-500">'+(i+1)+'</td><td class="px-4 py-2.5 font-medium">'+(c.name||'')+'</td><td class="px-4 py-2.5 text-right">'+fmtMl(c.ml||0)+'</td><td class="px-4 py-2.5 text-right font-bold">'+fmtRp(c.cost||0)+'</td></tr>';
     }
     ct.innerHTML=ch;
+
+    // Render Ecolab
+    if(ecolabTable){
+      var eh='';
+      var totalMlE=0, totalCostE=0;
+      for(var ei=0; ei<ecolabData.length; ei++){
+        var ec=ecolabData[ei];
+        totalMlE+= (ec.ml||0);
+        totalCostE+= (ec.cost||0);
+        eh+='<tr class="border-t border-slate-100"><td class="px-4 py-2.5 text-slate-500">'+(ei+1)+'</td><td class="px-4 py-2.5 font-medium">'+(ec.name||'')+'</td><td class="px-4 py-2.5 text-right">'+fmtMl(ec.ml||0)+'</td><td class="px-4 py-2.5 text-right font-bold">'+fmtRp(ec.cost||0)+'</td></tr>';
+      }
+      ecolabTable.innerHTML=eh;
+      if(ecolabFoot){
+        ecolabFoot.innerHTML='<tr><td class="px-4 py-2.5">TOTAL</td><td class="px-4 py-2.5"></td><td class="px-4 py-2.5 text-right">'+fmtMl(totalMlE)+'</td><td class="px-4 py-2.5 text-right">'+fmtRp(totalCostE)+'</td></tr>';
+      }
+      if(ecolabBadge) ecolabBadge.innerText=ecolabData.length+' item | '+fmtRp(totalCostE);
+    }
+
+    // Render Seitz (Viva)
+    if(seitzTable){
+      var sh='';
+      var totalMlS=0, totalCostS=0;
+      for(var si=0; si<seitzData.length; si++){
+        var sc=seitzData[si];
+        totalMlS+= (sc.ml||0);
+        totalCostS+= (sc.cost||0);
+        sh+='<tr class="border-t border-slate-100"><td class="px-4 py-2.5 text-slate-500">'+(si+1)+'</td><td class="px-4 py-2.5 font-medium">'+(sc.name||'')+'</td><td class="px-4 py-2.5 text-right">'+fmtMl(sc.ml||0)+'</td><td class="px-4 py-2.5 text-right font-bold">'+fmtRp(sc.cost||0)+'</td></tr>';
+      }
+      seitzTable.innerHTML=sh;
+      if(seitzFoot){
+        seitzFoot.innerHTML='<tr><td class="px-4 py-2.5">TOTAL</td><td class="px-4 py-2.5"></td><td class="px-4 py-2.5 text-right">'+fmtMl(totalMlS)+'</td><td class="px-4 py-2.5 text-right">'+fmtRp(totalCostS)+'</td></tr>';
+      }
+      if(seitzBadge) seitzBadge.innerText=seitzData.length+' item | '+fmtRp(totalCostS);
+    }
   }
 
   // Program Pencucian
