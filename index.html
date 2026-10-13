@@ -10,7 +10,7 @@
 <style>body{background:#f6f7fb;font-family:Inter,sans-serif}.card{background:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.04);border:1px solid #eef2f7}.kpi{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 50%,#2563eb 100%)}canvas{max-width:100%!important}.quick-active{outline:2px solid #0f172a;outline-offset:2px}</style>
 </head>
 <body>
-<script>var GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycby69sXrAS4y0O9pE2ZmLGmN0jFUGDNXH13bvB2hSw_QyUUPPj-pXdTAd_3ql0nVMYI4/exec";</script>
+<script>var GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzTDONpPjtUIKiH1R5UqUtQfuUcsLisEgTmzayOvjN5UdCJA_qgS6t1D7b-UL6msgX6/exec";</script>
 
 <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-6">
 <div class="flex justify-between items-center mb-4"><div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log</h1><p class="text-xs text-slate-500">Machines • Chemicals • Expenses</p></div><div class="flex items-center gap-2"><span id="statusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span id="statusText" class="text-xs text-slate-500">Loading</span></div></div>
@@ -126,28 +126,7 @@
 <div class="card p-4 md:p-5 mb-5"><div class="flex justify-between items-center mb-4"><h3 class="text-sm font-bold">Konsumsi Chemical per Mesin</h3><select id="machineSelect" onchange="renderMachineChem()" class="text-xs border rounded-full px-3 py-1.5 bg-white"></select></div><div id="machineChemInsight" class="text-xs text-slate-600 bg-slate-50 rounded-xl p-3 mb-4"></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><p class="text-[10px] uppercase font-bold mb-2">ML per Chemical</p><div class="h-[240px]"><canvas id="machineChemMlChart"></canvas></div></div><div><p class="text-[10px] uppercase font-bold mb-2">Biaya per Chemical</p><div class="h-[240px]"><canvas id="machineChemRpChart"></canvas></div></div></div><div class="overflow-x-auto mt-4"><table class="w-full text-xs"><thead class="text-[10px] text-slate-400 uppercase tracking-widest"><tr><th class="text-left px-4 py-2">Chemical</th><th class="text-right px-4 py-2">ml</th><th class="text-right px-4 py-2">Biaya</th><th class="text-right px-4 py-2">%</th></tr></thead><tbody id="machineChemTable"></tbody></table></div></div>
 
 </div>
-<!-- BREAKDOWN PROGRAM PER MESIN - ADDED -->
-<div id="machineProgramSection" class="mt-6 border-t border-slate-200 pt-5">
-  <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
-    <h4 class="text-sm font-bold">Breakdown Program Pencucian — <span id="machineProgramName" class="text-blue-600">-</span></h4>
-    <span id="machineProgramTotalBadge" class="text-[10px] bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-bold">0 total</span>
-  </div>
-  <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
-    <div class="lg:col-span-3">
-      <p class="text-[10px] uppercase font-bold mb-2">Jumlah per Program (Kali)</p>
-      <div class="h-[320px]"><canvas id="machineProgramChart"></canvas></div>
-    </div>
-    <div class="lg:col-span-2">
-      <div class="overflow-y-auto max-h-[320px] border rounded-xl">
-        <table class="w-full text-xs">
-          <thead...><tr><th>Nama Program</th><th>Frekuensi</th><th>%</th></tr></thead>
-          <tbody id="machineProgramTable"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-  
+
 <script>
 var currentData=null;var charts={};
 function fmtKg(v){return (v||0).toLocaleString('id-ID',{maximumFractionDigits:0})+' Kg';}
