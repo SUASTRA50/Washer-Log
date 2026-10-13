@@ -10,7 +10,7 @@
 <style>body{background:#f6f7fb;font-family:Inter,sans-serif}.card{background:#fff;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,.04);border:1px solid #eef2f7}.kpi{background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 50%,#2563eb 100%)}canvas{max-width:100%!important}.quick-active{outline:2px solid #0f172a;outline-offset:2px}</style>
 </head>
 <body>
-<script>var GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycbzTDONpPjtUIKiH1R5UqUtQfuUcsLisEgTmzayOvjN5UdCJA_qgS6t1D7b-UL6msgX6/exec";</script>
+<script>var GOOGLE_SCRIPT_URL="https://script.google.com/macros/s/AKfycbwXcKiWAr6mrWMqbGqFs5NhAEMvxEEC5bxPw6v6_R5dCQviHVf9VpLmw9GRB13qZUW0/exec";</script>
 
 <div class="max-w-[1440px] mx-auto px-4 md:px-6 py-6">
 <div class="flex justify-between items-center mb-4"><div><h1 class="font-['Plus_Jakarta_Sans'] text-2xl font-bold">Washer Log</h1><p class="text-xs text-slate-500">Machines • Chemicals • Expenses</p></div><div class="flex items-center gap-2"><span id="statusDot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span id="statusText" class="text-xs text-slate-500">Loading</span></div></div>
@@ -123,7 +123,36 @@
 
 <div class="card p-4 md:p-5 mb-5"><div class="flex justify-between items-center mb-3"><h3 class="text-sm font-bold">Program Pencucian</h3><span class="text-[10px] text-slate-400 uppercase tracking-widest">Frekuensi Penggunaan</span></div><div class="overflow-x-auto"><table class="w-full text-xs"><thead class="text-[10px] text-slate-500 uppercase tracking-widest"><tr><th class="text-left px-4 py-2 w-[50px]">RANK</th><th class="text-left px-4 py-2">NAMA PROGRAM</th><th class="text-right px-4 py-2">FREKUENSI</th></tr></thead><tbody id="programTable"></tbody></table></div></div>
 
-<div class="card p-4 md:p-5 mb-5"><div class="flex justify-between items-center mb-4"><h3 class="text-sm font-bold">Konsumsi Chemical per Mesin</h3><select id="machineSelect" onchange="renderMachineChem()" class="text-xs border rounded-full px-3 py-1.5 bg-white"></select></div><div id="machineChemInsight" class="text-xs text-slate-600 bg-slate-50 rounded-xl p-3 mb-4"></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><p class="text-[10px] uppercase font-bold mb-2">ML per Chemical</p><div class="h-[240px]"><canvas id="machineChemMlChart"></canvas></div></div><div><p class="text-[10px] uppercase font-bold mb-2">Biaya per Chemical</p><div class="h-[240px]"><canvas id="machineChemRpChart"></canvas></div></div></div><div class="overflow-x-auto mt-4"><table class="w-full text-xs"><thead class="text-[10px] text-slate-400 uppercase tracking-widest"><tr><th class="text-left px-4 py-2">Chemical</th><th class="text-right px-4 py-2">ml</th><th class="text-right px-4 py-2">Biaya</th><th class="text-right px-4 py-2">%</th></tr></thead><tbody id="machineChemTable"></tbody></table></div></div>
+<div class="card p-4 md:p-5 mb-5">
+<div class="flex justify-between items-center mb-4"><h3 class="text-sm font-bold">Konsumsi Chemical per Mesin</h3><select id="machineSelect" onchange="renderMachineChem()" class="text-xs border rounded-full px-3 py-1.5 bg-white"></select></div>
+<div id="machineChemInsight" class="text-xs text-slate-600 bg-slate-50 rounded-xl p-3 mb-4"></div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><p class="text-[10px] uppercase font-bold mb-2">ML per Chemical</p><div class="h-[240px]"><canvas id="machineChemMlChart"></canvas></div></div><div><p class="text-[10px] uppercase font-bold mb-2">Biaya per Chemical</p><div class="h-[240px]"><canvas id="machineChemRpChart"></canvas></div></div></div>
+<div class="overflow-x-auto mt-4"><table class="w-full text-xs"><thead class="text-[10px] text-slate-400 uppercase tracking-widest"><tr><th class="text-left px-4 py-2">Chemical</th><th class="text-right px-4 py-2">ml</th><th class="text-right px-4 py-2">Biaya</th><th class="text-right px-4 py-2">%</th></tr></thead><tbody id="machineChemTable"></tbody></table></div>
+
+<!-- BREAKDOWN PROGRAM PER MESIN - ADDED -->
+<div id="machineProgramSection" class="mt-6 border-t border-slate-200 pt-5">
+  <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+    <h4 class="text-sm font-bold">Breakdown Program Pencucian — <span id="machineProgramName" class="text-blue-600">-</span></h4>
+    <span id="machineProgramTotalBadge" class="text-[10px] bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-bold">0 total</span>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+    <div class="lg:col-span-3">
+      <p class="text-[10px] uppercase font-bold mb-2 tracking-widest text-slate-500">Jumlah per Program (Kali)</p>
+      <div class="h-[320px]"><canvas id="machineProgramChart"></canvas></div>
+    </div>
+    <div class="lg:col-span-2">
+      <div class="overflow-y-auto max-h-[320px] border rounded-xl">
+        <table class="w-full text-xs">
+          <thead class="text-[10px] text-slate-500 uppercase tracking-widest sticky top-0 bg-slate-50"><tr><th class="text-left px-3 py-2">Nama Program</th><th class="text-right px-3 py-2">Frekuensi</th><th class="text-right px-3 py-2">%</th></tr></thead>
+          <tbody id="machineProgramTable"></tbody>
+        </table>
+      </div>
+      <div id="machineProgramEmpty" class="hidden text-[11px] text-slate-400 p-4 text-center border border-dashed rounded-xl mt-2">Belum ada data program untuk mesin ini.<br>Pastikan backend mengirim <code>machineProgramList</code> atau <code>programs</code> per mesin.</div>
+    </div>
+  </div>
+</div>
+
+</div>
 
 </div>
 
@@ -344,6 +373,118 @@ function renderMachineChem(){
   for(var i=0;i<top5.length;i++){lMl.push(top5[i].name.replace('ES ','').slice(0,15));dMl.push(top5[i].ml);lRp.push(top5[i].name.slice(0,15));dRp.push(top5[i].cost);}
   charts.mMl=new Chart(document.getElementById('machineChemMlChart'),{type:'bar',data:{labels:lMl,datasets:[{label:'ml',data:dMl,backgroundColor:'#2563eb'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
   charts.mRp=new Chart(document.getElementById('machineChemRpChart'),{type:'doughnut',data:{labels:lRp,datasets:[{data:dRp,backgroundColor:['#0f172a','#2563eb','#60a5fa','#93c5fd','#dbeafe']}]},options:{responsive:true,maintainAspectRatio:false}});
+
+  // === PROGRAM BREAKDOWN PER MESIN ===
+  try{
+    var progNameEl=document.getElementById('machineProgramName');
+    var progBadge=document.getElementById('machineProgramTotalBadge');
+    var progTable=document.getElementById('machineProgramTable');
+    var progEmpty=document.getElementById('machineProgramEmpty');
+    if(progNameEl) progNameEl.innerText=name;
+
+    // Cari data program untuk mesin ini dari berbagai kemungkinan struktur API
+    var progList = null;
+
+    // 1. Langsung dari md.programs / md.programBreakdown / md.programsRank
+    if(md.programs && md.programs.length) progList = md.programs;
+    else if(md.programBreakdown && md.programBreakdown.length) progList = md.programBreakdown;
+    else if(md.programList && md.programList.length) progList = md.programList;
+    else if(md.programRank && md.programRank.length) progList = md.programRank;
+
+    // 2. Dari currentData.machineProgramList: [{machine, programs: []}]
+    if(!progList && currentData.machineProgramList){
+      for(var mp=0; mp<currentData.machineProgramList.length; mp++){
+        var mpl=currentData.machineProgramList[mp];
+        if(mpl.machine===name && mpl.programs){ progList=mpl.programs; break; }
+        if(mpl.machine===name && mpl.programBreakdown){ progList=mpl.programBreakdown; break; }
+      }
+    }
+    // 3. Dari map: currentData.machineProgramMap[name]
+    if(!progList && currentData.machineProgramMap && currentData.machineProgramMap[name]){
+      progList=currentData.machineProgramMap[name];
+    }
+    // 4. Dari currentData.programPerMachine
+    if(!progList && currentData.programPerMachine && currentData.programPerMachine[name]){
+      progList=currentData.programPerMachine[name];
+    }
+    // 5. Dari currentData.machinePrograms
+    if(!progList && currentData.machinePrograms && currentData.machinePrograms[name]){
+      progList=currentData.machinePrograms[name];
+    }
+
+    if(!progList) progList=[];
+
+    // Normalisasi: support {program, count}, {name, count}, {program, frekuensi}, {nama, jumlah}
+    var normalized=[];
+    for(var pi=0; pi<progList.length; pi++){
+      var p=progList[pi];
+      var pName = p.program || p.name || p.nama || p.programName || p.NAMA_PROGRAM || '';
+      var pCount = p.count || p.frekuensi || p.jumlah || p.total || p.value || p.cnt || 0;
+      if(!pName) continue;
+      normalized.push({name: pName, count: parseInt(pCount)||0});
+    }
+    // Sort descending
+    normalized.sort(function(a,b){return b.count-a.count;});
+
+    var totalProg = 0;
+    for(var ti=0; ti<normalized.length; ti++) totalProg+=normalized[ti].count;
+
+    if(progBadge) progBadge.innerText=totalProg.toLocaleString('id-ID')+' total | '+normalized.length+' jenis';
+    if(charts.mProg && charts.mProg.destroy) charts.mProg.destroy();
+
+    if(normalized.length===0){
+      if(progTable) progTable.innerHTML='';
+      if(progEmpty) progEmpty.classList.remove('hidden');
+      var ctxP=document.getElementById('machineProgramChart');
+      if(ctxP){
+        var c=ctxP.getContext('2d');
+        c.clearRect(0,0,ctxP.width,ctxP.height);
+      }
+    }else{
+      if(progEmpty) progEmpty.classList.add('hidden');
+      // Table
+      var pth='';
+      for(var i=0;i<normalized.length;i++){
+        var pct = totalProg? (normalized[i].count/totalProg*100).toFixed(1):0;
+        var rank = i+1;
+        pth+='<tr class="border-t border-slate-100 hover:bg-slate-50"><td class="px-3 py-2.5"><div class="flex items-center gap-2"><span class="text-[10px] text-slate-400 w-5">#'+rank+'</span><span class="w-2 h-2 rounded-full bg-blue-500"></span><span class="font-medium">'+normalized[i].name+'</span></div></td><td class="px-3 py-2.5 text-right font-bold">'+normalized[i].count+' Kali</td><td class="px-3 py-2.5 text-right"><span class="bg-slate-100 px-2 py-0.5 rounded-full text-[11px]">'+pct+'%</span></td></tr>';
+      }
+      if(progTable) progTable.innerHTML=pth;
+
+      // Chart - horizontal bar
+      var labels = normalized.map(function(x){ return x.name.length>22? x.name.slice(0,22)+'…' : x.name; });
+      var values = normalized.map(function(x){ return x.count; });
+      var bgColors = values.map(function(_,i){
+        var palette=['#2563eb','#3b82f6','#60a5fa','#93c5fd','#bfdbfe','#1e40af','#1d4ed8','#0f172a','#475569','#64748b'];
+        return palette[i%palette.length];
+      });
+
+      var ctxEl=document.getElementById('machineProgramChart');
+      if(ctxEl){
+        charts.mProg=new Chart(ctxEl,{
+          type:'bar',
+          data:{labels:labels, datasets:[{label:'Frekuensi', data:values, backgroundColor:bgColors, borderRadius:6, barThickness: 18}]},
+          options:{
+            indexAxis:'y',
+            responsive:true,
+            maintainAspectRatio:false,
+            plugins:{
+              legend:{display:false},
+              tooltip:{
+                callbacks:{
+                  label:function(c){ return ' '+c.raw+' Kali ('+(totalProg? (c.raw/totalProg*100).toFixed(1):0)+'%)'; }
+                }
+              }
+            },
+            scales:{
+              x:{beginAtZero:true, grid:{color:'#f1f5f9'}, ticks:{font:{size:10}}},
+              y:{grid:{display:false}, ticks:{font:{size:11, weight:600}}}
+            }
+          }
+        });
+      }
+    }
+  }catch(e){ console.error('Program breakdown error', e); }
 }
 
 
